@@ -1,0 +1,26 @@
+.test{border: 1px solid red;}
+body{
+  font-family: 'Lato', sans-serif;
+}
+
+.h-p{
+  height: 795px;
+}
+
+.sidebar-custom::-webkit-scrollbar {
+  width: 6px;  /* Ajusta el ancho para que no ocupe mucho espacio */
+}
+
+.sidebar-custom::-webkit-scrollbar-track {
+  background: transparent;  /* Aseguramos que el track sea transparente */
+}
+
+.sidebar-custom::-webkit-scrollbar-thumb {
+  background-color: #888;  /* Color del scrollbar */
+  border-radius: 10px;  /* Redondear la scrollbar para seguir el borde */
+  border: 3px solid transparent; /* Agrega espacio alrededor */
+}
+
+.sidebar-custom::-webkit-scrollbar-thumb:hover {
+  background: #555;  /* Cambia el color al hacer hover */
+}

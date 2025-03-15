@@ -1,0 +1,124 @@
+---
+import DashboardLayout from '../layouts/Dashboard-Layout.astro';
+import api from './hardjsontableexample.json'
+
+    const data = api
+    const limitepag = 5
+    const pagina = 0
+    const finDatos = data.length
+---
+
+<DashboardLayout title="Gestión de usuarios" path='Gestion de usuarios' pageTitle=' Gestión de usuarios'>
+      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Agregar usuario</a>
+            <!------------------------TABLE-------------------- -->
+            <!------------------------TABLE-------------------- -->
+          <div class="mb-10 mt-5">
+            <div class="xl:w-full px-10">
+              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded mb-5">
+                <div class="rounded-t mb-0 px-4 py-3 border-0">
+                  <div class="flex flex-wrap items-center">
+                    <div class="relative w-full px-2 flex-grow flex-1">
+                      <h3 class="font-semibold text-base text-blueGray-700">Lista de usuarios</h3>
+                    </div>
+                    <div class="relative flex-grow flex-1 sm:text-right">
+                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
+                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="block w-full overflow-x-auto">
+                  <table class="items-center bg-transparent w-full border-collapse ">
+                    <thead>
+                      <tr>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Permiso</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
+                      </tr>
+                    </thead>
+            
+                    <tbody id="tbody">
+                      {
+                          data.slice(0,limitepag).map(user => (
+                          <tr>
+                          <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
+                            {user.dni}
+                          </th>
+                          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                            {user.nombreyapellido}
+                          </td>
+                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                            {user.permiso}
+                          </td>
+                          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
+                            <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
+                            <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
+                          </td>
+                        </tr>
+                        ))
+                      }
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="flex flex-col items-center">
+                <!-- Help text -->
+                <span class="text-sm text-gray-700 dark:text-gray-400">
+                    Mostrando <span class="font-semibold text-gray-900 dark:text-white" id="paginacionI">{pagina}</span> a <span class="font-semibold text-gray-900 dark:text-white" id="paginacionF">{pagina+limitepag}</span> de <span class="font-semibold text-gray-900 dark:text-white" id="paginacionT">{finDatos}</span> entradas
+                </span>
+                <div class="inline-flex mt-2 xs:mt-0">
+                  <!-- Buttons -->
+                  <button id="pagAnterior" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+                      </svg>
+                      Anterior
+                  </button>
+                  <button id="pagSiguiente" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                      Siguiente
+                      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+          </div>
+</DashboardLayout>
+
+<script>
+  //@ts-nocheck 
+  import data from "./hardjsontableexample.json"
+  document.querySelector('#pagAnterior')?.addEventListener('click',()=>{
+    
+  })
+  document.querySelector('#pagSiguiente')?.addEventListener('click',paginaSiguiente)
+
+  function paginaSiguiente(){
+    console.log("Siguiente")
+    let contenidoTabla = document.querySelector("#tbody")
+    contenidoTabla.innerHTML= ""
+    document.querySelector("#paginacionI").innerHTML= 5
+    document.querySelector("#paginacionF").innerHTML= (5+(data.length-5))
+    document.querySelector("#paginacionT").innerHTML= data.length
+    data.slice(5,data.length).map(user =>{
+      contenidoTabla.innerHTML +=`<tr>
+                          <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
+                            ${user.dni}
+                          </th>
+                          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                            ${user.nombreyapellido}
+                          </td>
+                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                            ${user.permiso}
+                          </td>
+                          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
+                            <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
+                            <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
+                          </td>
+                        </tr>`
+    })
+  }
+</script>

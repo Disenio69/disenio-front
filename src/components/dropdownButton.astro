@@ -1,0 +1,71 @@
+---
+interface Props {
+    buttonText:string
+    options: string[];
+}
+
+let opCont = 0
+
+const { buttonText,options } = Astro.props;
+---
+
+<div id="dropdownButtonOption" class="px-8 py-0.5 inline-block relative rounded-3xl text-black text-sm ml-10 mr-0 text-white bg-blue-700">
+    <button id="buttonText">{buttonText}</button>
+    <i class="fa-solid fa-angle-down"></i>
+    <div id="dropdownContentOption" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-xl border-2 left-0 z-10">
+        {
+            options.map(item => {
+                opCont++
+                return (
+                    <a id={"op"+opCont.toString()} href="#">{item}</a>
+                )
+            })
+                
+        }
+    </div>
+</div>
+
+
+<style>
+
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #ddd;
+}
+</style>
+
+<script>
+    //@ts-nocheck 
+    //MENU DESPLEGABLE
+    const  drop = document.querySelector("#dropdownButtonOption")
+    const dropmenu = document.querySelector("#dropdownContentOption")
+    drop?.addEventListener("click",()=>{
+        if(dropmenu?.classList.contains("hidden")){
+            dropmenu?.classList.remove("hidden")
+        }
+        else
+        {
+            dropmenu?.classList.add("hidden")
+        }})
+
+    //OPCIONES
+    const options : any = dropmenu?.childNodes
+    options.forEach(child=> {
+        child.addEventListener("click",()=>{
+            let nameOption = child.textContent
+            const buttonText = document.querySelector("#buttonText")
+            if(buttonText !== null){
+                buttonText.innerHTML = `curso : ${nameOption}`
+                console.log("prueba")
+            }
+        })
+        
+    });
+
+</script>
