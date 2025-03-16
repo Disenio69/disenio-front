@@ -207,7 +207,7 @@ const { title,path,pageTitle } = Astro.props;
               </nav>
         
               <h1 class="mx-20 w-auto text-white font-bold text-5xl mt-10 mb-10">{pageTitle}</h1>
-              <section class="mx-10 w-auto bg-white rounded-2xl shadow-xl h-p pt-5">
+              <section class="mx-10 w-auto bg-white rounded-2xl shadow-xl h-p pt-3">
                 <slot /> <!--Contenido variable -->
               </section>
               
@@ -289,7 +289,7 @@ body{
 }
 
 .h-p{
-  height: 795px;
+  height: auto;
 }
 
 .sidebar-custom::-webkit-scrollbar {
