@@ -181,16 +181,6 @@ const { title,path,pageTitle } = Astro.props;
                     <!-- Sign in Menu(flex) config notificacion box -->
                     <ul class="md:ml-auto md:pr-4 flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
                       <li class="flex items-center">
-                        <div id="dropdownButtonMessage" class="flex relative bg-slate-900 rounded-full py-2.5 px-4">
-                          <button><i class="fa-solid fa-message" style="color: white;"></i></button>
-                          <div id="dropdownContentMessage" class="dropdown-content hidden absolute bg-white w-96 rounded-xl right-0 top-12 z-10 text-black">
-                            <a href="/perfil">Perfil</a>
-                            <a href="">Cerrar sesión</a>
-                          </div>
-                          
-                        </div>
-                      </li>
-                      <li class="flex items-center">
                         <div id="dropdownButton" class="py-1 px-2 flex relative rounded-3xl text-black text-sm ml-10 mr-0 text-white bg-slate-900">
                           <button class="ml-2 mr-3">Juan riquelme</button>
                           <div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full rounded-xl left-0 top-12 z-10 text-black">
@@ -200,6 +190,9 @@ const { title,path,pageTitle } = Astro.props;
                           <img src="../../public/img/avatar-femenino.png" alt="" class="w-10">
                         </div>
                       </li>
+                      <li id="display-menu" class="block xl:hidden flex items-center cursor-pointer text-black hover:text-gray-700 transition-all duration-200 ml-10">
+                        <i class="fa-solid fa-bars fa-2xl"></i>
+                      </li>
                     </ul>
                     <!-- FIN Sign in Menu(flex) config notificacion box -->
                   </div>
@@ -207,7 +200,7 @@ const { title,path,pageTitle } = Astro.props;
               </nav>
         
               <h1 class="mx-20 w-auto text-white font-bold text-5xl mt-10 mb-10">{pageTitle}</h1>
-              <section class="mx-10 w-auto bg-white rounded-2xl shadow-xl h-p pt-3">
+              <section class="mx-10 w-full bg-white rounded-2xl shadow-xl h-p pt-3">
                 <slot /> <!--Contenido variable -->
               </section>
               
@@ -289,7 +282,7 @@ body{
 }
 
 .h-p{
-  height: auto;
+  height: 800px;
 }
 
 .sidebar-custom::-webkit-scrollbar {

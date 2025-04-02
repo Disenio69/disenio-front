@@ -75,7 +75,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
   document.querySelector('#nextPage')?.addEventListener('click',nexPage)
   document.querySelector('#previousPage')?.addEventListener('click',previousPage)
 
-  document.querySelector('#tbody').addEventListener('click', async function(e) {
+  document.querySelector('#tbody').addEventListener('click', async function(e) { // Funcion que despliega la ventana modal de mas informacion
   if (e.target && e.target.id.startsWith('MoreInfo')) {
     data = await fetchData()
     const focusDataElement = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML) -1 //Comprobar esto luego ya que saco el "dni" del html y eso uso para mostrar los datos
@@ -141,6 +141,56 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
     const mainDiv = document.querySelector('#mainDiv')
     mainDiv?.appendChild(div)
   }
+  
+  if(e.target && e.target.id.startsWith('deleteButton')){ //Boton borrar de la tabla
+      const focusDataId = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML)
+      
+      try {
+        const respuesta = await fetch(`https://tu-api.com/elementos/${focusDataId}`, {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!respuesta.ok) {
+            throw new Error(`Error al eliminar el elemento: ${respuesta.statusText}`);
+        }
+
+        console.log(`Elemento con ID ${id} eliminado correctamente.`);
+      }
+      catch (error) {
+        console.error("Hubo un error:", error);
+      }
+
+    }
+
+    if(e.target && e.target.id.startsWith('editButton')){// Boton editar
+      const focusDataId = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML)
+      console.log("modificar "+ focusDataId)
+      //TERMINAR-----------
+      
+      // try {
+      //   const respuesta = await fetch(`https://tu-api.com/elementos/${id}`, {
+      //       method: "PUT", // Cambia a "PATCH" si solo quieres modificar algunos campos
+      //       headers: {
+      //           "Content-Type": "application/json",
+      //           "Authorization": "Bearer TU_TOKEN_AQUI" // Si la API requiere autenticación
+      //       },
+      //       body: JSON.stringify(nuevosDatos)
+      //   });
+
+      //   if (!respuesta.ok) {
+      //       throw new Error(`Error al modificar el elemento: ${respuesta.statusText}`);
+      //   }
+
+      //   const data = await respuesta.json();
+      //   console.log("Elemento modificado:", data);
+      // } catch (error) {
+      //   console.error("Error:", error);
+      // }
+
+    }
 })
 
   document.querySelector('#mainDiv')?.addEventListener('click', function(e) {
@@ -197,8 +247,8 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                                   <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                     <span>
                                       <button id="MoreInfo" class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
-                                      <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                                      <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
+                                      <button id="editButton" class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;pointer-events: none;"></i></button>
+                                      <button id="deleteButton" class="rounded-3xl bg-red-600 w-6 h-6 text-black">x</button>
                                     </span>
                                   </td>
                                 </tr>`
