@@ -13,11 +13,11 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="input-first-name" type="text" placeholder="Jane">
           </div>
           
-          <div class="w-full md:w-1/2 px-3">
+          <div class="w-full md:w-1/2 px-3 mb-6">
             <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-last-name">
               Apellido
             </label>
-            <input class="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="input-last-name" type="text" placeholder="Doe">
+            <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none focus:bg-white" id="input-last-name" type="text" placeholder="Doe">
           </div>
 
           <div class="w-full md:w-1/2 px-3 mb-6">
@@ -62,19 +62,96 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 </DashboardLayout>
 
 <script>
+  import {Notification} from "../components/notifications.js"
     document.querySelector("#form-user-add")?.addEventListener("submit", async function(event) {
       event.preventDefault();
-      const formData = {
-        nombre: (document.querySelector("#input-first-name") as HTMLInputElement).value,
-        apellido: (document.querySelector("#input-last-name") as HTMLInputElement).value,
-        dni: (document.querySelector("#input-dni") as HTMLInputElement).value,
-        more: (document.querySelector("#input-more") as HTMLInputElement).value,
-        more2: (document.querySelector("#input-more2") as HTMLInputElement).value,
-        more3: (document.querySelector("#input-more3") as HTMLInputElement).value
-      };
       
-      console.log(formData)
-    
+      let error = 0
+      const nombre = (document.querySelector("#input-first-name") as HTMLInputElement).value
+      const apellido = (document.querySelector("#input-last-name") as HTMLInputElement).value
+      const dni = (document.querySelector("#input-dni") as HTMLInputElement).value
+      const more = (document.querySelector("#input-more") as HTMLInputElement).value
+      const more2 = (document.querySelector("#input-more2") as HTMLInputElement).value
+      const more3 = (document.querySelector("#input-more3") as HTMLInputElement).value
+      
+      Notification.prototype.deletePreviousNotification()
+
+      if(nombre.trim().length !== 0){
+        if(!/^[a-zA-Z\s]+$/.test(nombre)) {
+          new Notification("Error: No es posible ingresar simbolos o números","error",document.querySelector('#input-first-name'))
+          error = 1
+        }
+      }else{
+        new Notification("Este campo de obligatorio","error",document.querySelector('#input-first-name'))
+        error = 1
+      }
+      
+      if(apellido.trim().length !== 0){
+        if(!/^[a-zA-Z\s]+$/.test(apellido)){
+          new Notification("Error: No es posible ingresar simbolos o números","error",document.querySelector('#input-last-name'))
+          error = 1
+        }
+      }
+      else{
+        new Notification("Este campo de obligatorio","error",document.querySelector('#input-last-name'))
+        error = 1
+      }
+     
+      if(dni.trim().length !== 0){
+        if(!/^\d+$/.test(dni)){
+          new Notification("Error: Ingrese solo números","error",document.querySelector('#input-dni'))
+          error = 1
+        }
+      }
+      else{
+        new Notification("Este campo de obligatorio","error",document.querySelector('#input-dni'))
+        error = 1
+      }
+
+      if(more.trim().length !== 0){
+        if(!/^[a-zA-Z\s]+$/.test(more)){
+          new Notification("Error: No es posible ingresar simbolos o números","error",document.querySelector('#input-more'))
+          error = 1
+        }
+      }
+      else{
+        new Notification("Este campo de obligatorio","error",document.querySelector('#input-more'))
+        error = 1
+      }
+
+      if(more2.trim().length !== 0){
+        if(!/^[a-zA-Z\s]+$/.test(more2)){
+          new Notification("Error: No es posible ingresar simbolos o números","error",document.querySelector('#input-more2'))
+          error = 1
+        }
+      }
+      else{
+        new Notification("Este campo de obligatorio","error",document.querySelector('#input-more2'))
+        error = 1
+      }
+
+      if(more3.trim().length !== 0){
+        if(!/^[a-zA-Z\s]+$/.test(more3)){
+          new Notification("Error: No es posible ingresar simbolos o números","error",document.querySelector('#input-more3'))
+          error = 1
+        }
+      }
+      else{
+        new Notification("Este campo de obligatorio","error",document.querySelector('#input-more3'))
+        error = 1
+      }
+
+      if(error === 0){
+        console.log("ENVIANDOOOOOO")
+        const formData = {
+        nombre: nombre,
+        apellido: apellido,
+        dni: dni,
+        more: more,
+        more2: more2,
+        more3: more3
+        }
+
       //   try {
         
     //     // Enviar datos a la API
@@ -99,6 +176,11 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
     //   } catch (error) {
     //     alert("Error: " + error.message);
     //   }
+
+        //window.location.href = "./gestion-de-usuarios";
+      }
+
+
 }
 );
   </script>

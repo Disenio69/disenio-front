@@ -143,27 +143,55 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
   }
   
   if(e.target && e.target.id.startsWith('deleteButton')){ //Boton borrar de la tabla
-      const focusDataId = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML)
+    const div = document.createElement('DIV')
+    div.innerHTML = `
+        <div id="modal" class="fixed inset-0 flex items-center justify-center">
+            <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
+
+            <!-- Título -->
+            <h2 class="text-3xl font-bold text-black text-center">
+                ¿Esta seguro de que desea eliminar a este usuario?
+            </h2>
+            <!-- Botón de eliminar -->
+            <div class="flex mt-4">
+                <button id="deleteUser" 
+                        class="bg-red-500 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200 flex-start">
+                    Eliminar
+                </button>
+                <button id="closeModal" 
+                        class="bg-white hover:bg-gray-200 text-black font-semibold ml-40 px-6 py-3 rounded-lg shadow-md transition-all duration-200">
+                    Cancelar
+                </button>
+                
+            </div>
+        </div>
+        </div>
+    `
+    const mainDiv = document.querySelector('#mainDiv')
+    mainDiv?.appendChild(div)
+      }
+    
+    //   const focusDataId = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML)
       
-      try {
-        const respuesta = await fetch(`https://tu-api.com/elementos/${focusDataId}`, {
-            method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
+    //   try {
+    //     const respuesta = await fetch(`https://tu-api.com/elementos/${focusDataId}`, {
+    //         method: "DELETE",
+    //         headers: {
+    //             "Content-Type": "application/json",
+    //         },
+    //     });
 
-        if (!respuesta.ok) {
-            throw new Error(`Error al eliminar el elemento: ${respuesta.statusText}`);
-        }
+    //     if (!respuesta.ok) {
+    //         throw new Error(`Error al eliminar el elemento: ${respuesta.statusText}`);
+    //     }
 
-        console.log(`Elemento con ID ${id} eliminado correctamente.`);
-      }
-      catch (error) {
-        console.error("Hubo un error:", error);
-      }
+    //     console.log(`Elemento con ID ${id} eliminado correctamente.`);
+    //   }
+    //   catch (error) {
+    //     console.error("Hubo un error:", error);
+    //   }
 
-    }
+    // }
 
     if(e.target && e.target.id.startsWith('editButton')){// Boton editar
       const focusDataId = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML)
