@@ -2,37 +2,159 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Formulario para cargar un nuevo curso' path='Agregar nuevo curso' pageTitle='Agregar nuevo curso'>
-    <div class="ml-6 w-full max-w-xs">
-        <form class="rounded px-8 pt-6 pb-8 mb-4">
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="dni">Nombre del curso</label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="dni" type="text" placeholder="Carpiteria">
+<DashboardLayout title='Agregar un nuevo curso' path='Agregar un nuevo curso' pageTitle='Agregar un nuevo curso'>
+    <form id="form-user-add" class="w-full pl-16 pr-16 mt-6">      
+      <div class="flex flex-wrap md:w-1/3 mx-3 mb-6">
+          <div class="w-full px-3 mb-6">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-firshName">
+              Nombre del curso
+            </label>
+            <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-firstName" type="text" placeholder="Carpinteria">
           </div>
-          <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="descripcion">Grado academico</label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="descripcion" type="text" placeholder="Carpintero">
+          
+          <div class="w-full px-3 mb-6">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-lastName">
+              Grado academico
+            </label>
+            <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-lastName" type="text" placeholder="Carpintero">
           </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="nota">Profesor a cargo</label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nota" type="text" placeholder="43503234">
+
+          <div class="w-full px-3 mb-6">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-birthday">
+              DNI del profesor a cargo
+            </label>
+            <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-birthday" type="text" onkeydown="return false;" placeholder="43234234">
           </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="nota">Descripcion</label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nota" type="text" placeholder="Curso de carpinteria general para fabricación de muebles del hogar">
+          
+          <div class="w-full px-3 mb-6">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-dni">
+              descripción
+            </label>
+            <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-dni" type="text" placeholder="Licenciatura en carpinteria de maderas blanca">
           </div>
-          <div class="mb-6">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="nota">Duración</label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="nota" type="text" placeholder="1 año">
+
+          <div class="w-full px-3 mb-6">
+            <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-user">
+              Duración
+            </label>
+            <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-user" type="text" placeholder="1 año">
           </div>
-          <div class="flex items-center justify-between">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
-              Cargar curso
+        </div>
+        <div class="flex items-center ml-6">
+            <button id="form-submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded " type="submit">
+              Agregar usuario
             </button>
-            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer" href="/administrar-cursos">
+            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/gestion-de-usuarios">
                 Cancelar
               </a>
           </div>
-        </form>
-      </div>
+      </form>
 </DashboardLayout>
+
+<script>
+// import {Notification} from "../components/notifications.js"
+// import {error,verifyInputOnlyLetters,verifyInputDate,verifyInputOnlyNumbers,verifyInputWithSimbols,verifyInputEmail} from "../components/inputVerification.ts"
+  
+
+//     document.querySelector("#form-user-add")?.addEventListener("submit", async function(event) {
+//       event.preventDefault();
+
+//       const name = (document.querySelector("#input-firstName") as HTMLInputElement)
+//       const lastName = (document.querySelector("#input-lastName") as HTMLInputElement)
+//       const birthDay = (document.querySelector("#input-birthday") as HTMLInputElement)
+//       const dni = (document.querySelector("#input-dni") as HTMLInputElement)
+//       const user = (document.querySelector("#input-user") as HTMLInputElement)
+//       const password = (document.querySelector("#input-password") as HTMLInputElement)
+//       const email = (document.querySelector("#input-email") as HTMLInputElement)
+//       const phone = (document.querySelector("#input-phone") as HTMLInputElement)
+//       const occupation = (document.querySelector("#input-occupation") as HTMLInputElement)
+//       const nationality = (document.querySelector("#input-nationality") as HTMLInputElement)
+//       const residence = (document.querySelector("#input-residence") as HTMLInputElement)
+//       const studyLevel = (document.querySelector("#input-studyLevel") as HTMLInputElement)
+//       const disability = (document.querySelector("#input-disability") as HTMLInputElement)
+//       const socialProgram = (document.querySelector("#input-socialProgram") as HTMLInputElement)
+      
+//       Notification.prototype.deletePreviousNotification()
+
+//       verifyInputOnlyLetters(name,4,20)
+//       verifyInputOnlyLetters(lastName,4,20)
+//       verifyInputDate(birthDay)
+//       verifyInputOnlyNumbers(dni,8,8)
+//       verifyInputWithSimbols(user,4,20)
+//       verifyInputWithSimbols(password,4,20)
+//       verifyInputEmail(email,3,100)
+//       verifyInputOnlyNumbers(phone,0,13)
+//       verifyInputOnlyLetters(occupation,4,100)
+//       verifyInputOnlyLetters(nationality,4,30)
+//       verifyInputOnlyLetters(studyLevel,4,30)
+//       verifyInputWithSimbols(residence,4,30)
+//       verifyInputOnlyLetters(disability,4,30)
+//       verifyInputWithSimbols(socialProgram,4,30)
+
+
+//       if(error === 0){
+//         if(isStudent){
+          
+//           const formData = {
+//           nombre: name,
+//           apellido: lastName,
+//           fechaNacimiento: birthDay,
+//           dni: dni,
+//           usuario: user,
+//           contraseña: password,
+//           correo: email,
+//           telefono: phone,
+//           ocupacion: occupation,
+//           nivelEstudio: studyLevel,
+//           residencia : residence,
+//           discapacidad : disability,
+//           socialProgram : socialProgram
+//           }
+
+//           console.log("ENVIANDOOOOOO alumno")
+//         }else{
+//           const formData = {
+//           nombre: name,
+//           apellido: lastName,
+//           fechaNacimiento: birthDay,
+//           dni: dni,
+//           usuario: user,
+//           contraseña: password,
+//           correo: email,
+//           telefono: phone,
+//           ocupacion: occupation,
+//         }
+//         console.log("ENVIANDOOOOOO personal")
+//       }
+
+//         try {
+        
+//         // Enviar datos a la API
+//         const response = await fetch("https://tuapi.com/agregar-curso", {
+//           method: "POST",
+//           headers: {
+//             "Content-Type": "application/json"
+//           },
+//           body: JSON.stringify(formData)
+//         });
+  
+//         if (!response.ok) {
+//           throw new Error("Error al agregar el curso");
+//         }
+  
+//         const result = await response.json();
+//         alert("Curso agregado correctamente");
+        
+//         // Limpiar formulario
+//         document.getElementById("cursoForm").reset();
+        
+//       } catch (error) {
+//         alert("Error: " + error.message);
+//       }
+
+//         window.location.href = "./gestion-de-usuarios";
+//       }
+//     }
+//   );
+
+  </script>
