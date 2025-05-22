@@ -9,7 +9,7 @@ export class Notification{
 
     mostrar(){
         const notificationNode = document.createElement('DIV')
-        notificationNode.classList.add("rounded-lg", "w-[475px]", "h-[30px]", "mx-auto", "mb-4", "py-1", "text-center", "text-white", "shadow-xl", "font-medium", "text-base", "notification","break-words");
+        notificationNode.classList.add("rounded-lg", "w-full", "h-[30px]", "mx-auto", "mb-4", "py-1", "text-center", "text-white", "shadow-xl", "font-medium", "text-base", "notification","break-words");
         
         const textNode = document.createElement('SPAN')
         textNode.textContent= this.text

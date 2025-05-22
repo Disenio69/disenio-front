@@ -39,42 +39,51 @@ const { title,path,pageTitle } = Astro.props;
               <div class="sidebar-custom items-center block w-auto h-full grow basis-full overflow-y-auto">
                 <ul class="flex flex-col pl-0 mb-0">
                   <li class="mt-0.5 w-full">
-                    <a class="py-2.7 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4  transition-colors" id="navbar-inicio" href="/inicio">
+                    <a class="py-2.7 dark:text-white dark:opacity-80 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap rounded-lg px-4  transition-colors" id="inicio-dashboard" href="/inicio-dashboard">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-house"></i>
                       </div>
                       <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Inicio</span>
                     </a>
                   </li>
-                  
+
                   <li class="w-full mt-4">
                     <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">CORRECCIÓN</h6>
                   </li>
-        
+
                   <li class="mt-0.5 w-full">
-                    <a class="dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-EyM" href="/examenes-y-materias">
-                      <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
-                        <i class="fa-solid fa-file-invoice"></i>
-                      </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Examen y Materias</span>
-                    </a>
-                  </li>
-        
-                  <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-practicos" href="/practicos">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-practicos" href="/gestion-practicos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center fill-current stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-pencil"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Prácticos</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión de prácticos</span>
+                    </a>
+                  </li>
+
+                  <li class="mt-0.5 w-full">
+                    <a class="dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-examenes" href="/gestion-examenes">
+                      <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+                        <i class="fa-solid fa-file-invoice"></i>
+                      </div>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión de examenes</span>
+                    </a>
+                  </li>
+
+                  <li class="mt-0.5 w-full">
+                    <a class="dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-notas" href="/gestion-notas">
+                      <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
+                        <i class="fa-solid fa-file-invoice"></i>
+                      </div>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión notas</span>
                     </a>
                   </li>
         
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-desempeno" href="/desempeno">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="desempeno-estudiantil" href="/desempeno-estudiantil">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-ranking-star"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Desempeño</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Desempeño estudiantil</span>
                     </a>
                   </li>
 
@@ -83,7 +92,7 @@ const { title,path,pageTitle } = Astro.props;
                   </li>
         
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-PdE" href="/administrar-cursos">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="administrar-cursos" href="/administrar-cursos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-clipboard"></i>
                       </div>
@@ -92,20 +101,20 @@ const { title,path,pageTitle } = Astro.props;
                   </li>
         
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-materias" href="/materias">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-materias" href="/gestion-materias">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-book"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Materias</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestion de materias</span>
                     </a>
                   </li>
         
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-AyH" href="/aulas-y-horarios">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-aulas-y-horarios" href="/gestion-aulas-y-horarios">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-clock"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Aulas y horarios</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión aulas y horarios</span>
                     </a>
                   </li>
 
@@ -114,7 +123,7 @@ const { title,path,pageTitle } = Astro.props;
                   </li>
 
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-GU" href="/gestion-de-usuarios">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-de-usuarios" href="/gestion-de-usuarios">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-user"></i>
                       </div>
@@ -123,11 +132,11 @@ const { title,path,pageTitle } = Astro.props;
                   </li>
 
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-IdE" href="/inscripcion-de-estudiantes">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="estudiantes-inscriptos" href="/estudiantes-inscriptos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-pen"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Inscripción de estudiantes</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Estudiantes Inscriptos</span>
                     </a>
                   </li>
 
@@ -136,7 +145,7 @@ const { title,path,pageTitle } = Astro.props;
                   </li>
 
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="navbar-titulacion" href="/titulacion">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="titulacion" href="/titulacion">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-graduation-cap"></i>
                       </div>
@@ -166,7 +175,7 @@ const { title,path,pageTitle } = Astro.props;
                     <!-- breadcrumb -->
                     <ol class="flex flex-wrap pt-1 mr-12 bg-transparent rounded-lg sm:mr-16">
                       <li class="text-sm leading-normal">
-                        <a class="text-white opacity-50" href="/inicio">Inicio</a>
+                        <a class="text-white opacity-50" href="/inicio-dashboard">Inicio</a>
                       </li>
                       <li class="text-sm pl-2 capitalize leading-normal text-white before:float-left before:pr-2 before:text-white before:content-['/']">{path}</li>
                     </ol>
@@ -200,7 +209,7 @@ const { title,path,pageTitle } = Astro.props;
               </nav>
         
               <h1 class="mx-20 w-auto text-white font-bold text-5xl mt-10 mb-10">{pageTitle}</h1>
-              <section class="mx-10 bg-white rounded-2xl shadow-xl h-p pt-3 ">
+              <section class="mx-10 bg-white rounded-2xl shadow-xl h-[780px] pt-3 pb-2 overflow-y-auto sidebar-custom box-border">
                 <slot /> <!--Contenido variable -->
               </section>
               
@@ -223,36 +232,44 @@ const { title,path,pageTitle } = Astro.props;
           })()
 
           function focus(currentPath: string){
-            if('examenes-y-materias' == currentPath){
-              document.querySelector('#navbar-EyM')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('gestion-de-usuarios' == currentPath){
-              document.querySelector('#navbar-GU')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('inicio' == currentPath){
-              document.querySelector('#navbar-inicio')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('aulas-y-horarios' == currentPath){
-              document.querySelector('#navbar-AyH')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('desempeno' == currentPath){
-              document.querySelector('#navbar-desempeno')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('inscripcion-de-estudiantes' == currentPath){
-              document.querySelector('#navbar-IdE')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('materias' == currentPath){
-              document.querySelector('#navbar-materias')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('plan-de-estudio' == currentPath){
-              document.querySelector('#navbar-PdE')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('practicos' == currentPath){
-              document.querySelector('#navbar-practicos')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
-            else if('titulacion' == currentPath){
-              document.querySelector('#navbar-titulacion')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            }
+            const arrayUrls = ['inicio-dashboard','gestion-practicos','gestion-examenes','gestion-notas','desempeno-estudiantil','administrar-cursos','gestion-materias','gestion-aulas-y-horarios','gestion-de-usuarios','estudiantes-inscriptos','titulacion']
+            
+            arrayUrls.forEach(url =>{
+              if(url == currentPath){
+                document.querySelector('#'+url)?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+              }
+            })
+            
+            // if('gestion-practicos' == currentPath){
+            //   document.querySelector(arrayUrls[0])?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('navbar-GE' == currentPath){
+            //   document.querySelector(arrayUrls[1])?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('inicio' == currentPath){
+            //   document.querySelector('#navbar-inicio')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('aulas-y-horarios' == currentPath){
+            //   document.querySelector('#navbar-AyH')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('desempeno' == currentPath){
+            //   document.querySelector('#navbar-desempeno')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('inscripcion-de-estudiantes' == currentPath){
+            //   document.querySelector('#navbar-IdE')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('materias' == currentPath){
+            //   document.querySelector('#navbar-materias')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('plan-de-estudio' == currentPath){
+            //   document.querySelector('#navbar-PdE')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('practicos' == currentPath){
+            //   document.querySelector('#navbar-practicos')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
+            // else if('titulacion' == currentPath){
+            //   document.querySelector('#navbar-titulacion')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+            // }
           }
 
           // Funcionalidad del menu para esconderse y mostrarse en resoluciones menores
@@ -280,11 +297,6 @@ const { title,path,pageTitle } = Astro.props;
 body{
   font-family: 'Lato', sans-serif;
 }
-
-.h-p{
-  height: 800px;
-}
-
 .sidebar-custom::-webkit-scrollbar {
   width: 6px;  /* Ajusta el ancho para que no ocupe mucho espacio */
 }
