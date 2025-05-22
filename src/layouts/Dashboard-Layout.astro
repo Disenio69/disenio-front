@@ -78,34 +78,34 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li>
         
-                  <li class="mt-0.5 w-full">
+                  <!-- <li class="mt-0.5 w-full">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="desempeno-estudiantil" href="/desempeno-estudiantil">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-ranking-star"></i>
                       </div>
                       <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Desempeño estudiantil</span>
                     </a>
-                  </li>
+                  </li> -->
 
                   <li class="w-full mt-4">
                     <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">PLAN ACADEMICO</h6>
                   </li>
         
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="administrar-cursos" href="/administrar-cursos">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="informacion-cursos" href="/informacion-cursos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-clipboard"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Administrar cursos</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Información sobre cursos</span>
                     </a>
                   </li>
         
                   <li class="mt-0.5 w-full">
-                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-materias" href="/gestion-materias">
+                    <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-cursos" href="/gestion-cursos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-book"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestion de materias</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión de cursos</span>
                     </a>
                   </li>
         
@@ -232,45 +232,14 @@ const { title,path,pageTitle } = Astro.props;
           })()
 
           function focus(currentPath: string){
-            const arrayUrls = ['inicio-dashboard','gestion-practicos','gestion-examenes','gestion-notas','desempeno-estudiantil','administrar-cursos','gestion-materias','gestion-aulas-y-horarios','gestion-de-usuarios','estudiantes-inscriptos','titulacion']
+            const arrayUrls = ['inicio-dashboard','gestion-practicos','gestion-examenes','gestion-notas','desempeno-estudiantil','informacion-cursos','gestion-cursos','gestion-aulas-y-horarios','gestion-de-usuarios','estudiantes-inscriptos','titulacion']
             
             arrayUrls.forEach(url =>{
               if(url == currentPath){
                 document.querySelector('#'+url)?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-              }
-            })
-            
-            // if('gestion-practicos' == currentPath){
-            //   document.querySelector(arrayUrls[0])?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('navbar-GE' == currentPath){
-            //   document.querySelector(arrayUrls[1])?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('inicio' == currentPath){
-            //   document.querySelector('#navbar-inicio')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('aulas-y-horarios' == currentPath){
-            //   document.querySelector('#navbar-AyH')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('desempeno' == currentPath){
-            //   document.querySelector('#navbar-desempeno')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('inscripcion-de-estudiantes' == currentPath){
-            //   document.querySelector('#navbar-IdE')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('materias' == currentPath){
-            //   document.querySelector('#navbar-materias')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('plan-de-estudio' == currentPath){
-            //   document.querySelector('#navbar-PdE')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('practicos' == currentPath){
-            //   document.querySelector('#navbar-practicos')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-            // else if('titulacion' == currentPath){
-            //   document.querySelector('#navbar-titulacion')?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-            // }
-          }
+                }
+              })
+            }
 
           // Funcionalidad del menu para esconderse y mostrarse en resoluciones menores
           const navbar = document.querySelector(".-translate-x-full")

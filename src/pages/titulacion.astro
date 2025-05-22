@@ -3,7 +3,11 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
 <DashboardLayout title='Realizar titulación' path='titulación' pageTitle='Titulacion de estudiantes'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Agregar usuario</a>
+      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/titular-estudiante">Titular estudiante</a>
+      <span class="float-right mr-14">
+        <span class="text-sm text-gray-700">Descargar como:</span>
+        <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+      </span>
             <!------------------------TABLE-------------------- -->
             <!------------------------TABLE-------------------- -->
           <div class="mb-10 mt-5">
@@ -12,7 +16,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                 <div class="rounded-t mb-0 px-4 py-3 border-0">
                   <div class="flex flex-wrap items-center">
                     <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Lista de usuarios</h3>
+                      <h3 class="font-semibold text-base text-blueGray-700">Lista de estudiantes titulados</h3>
                     </div>
                     <div class="relative flex-grow flex-1 sm:text-right">
                       <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">

@@ -3,10 +3,20 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 import DropdownButton from '../components/dropdownButton.astro';
 ---
 
-<DashboardLayout title='Gestión de examenes y materias' path='Examenes y materias' pageTitle='Gestión de examenes y materias'>
-      <DropdownButton buttonText='Seleccionar curso' options={["matematicas","carpinteria","programacion"]}></DropdownButton>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/formulario-cargar-examen">Cargar nota de examen</a>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/formulario-nota-materia">Cargar nota de materia</a>
+<DashboardLayout title='Gestión de examenes ' path='Gestión de examenes' pageTitle='Gestión de examenes'>
+  <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/cargar-examen">Cargar examén</a>
+  <div class="mt-4">
+    <span class="ml-10">Filtros:</span>
+      <select class="appearance-none leading-tight focus:outline-none rounded-3xl bg-gray-300 px-4 py-1.5 text-black text-sm ml-2 mr-0" id="select-career" name="career">
+        <option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>
+        <option class="bg-white text-black focus:outline-none" id="select-option" value="career 1">Peluqueria</option>
+        <option class="bg-white text-black focus:outline-none" id="select-option" value="career 2">Carpinteria</option>
+    </select>
+    <span class="float-right mr-14">
+      <span class="text-sm text-gray-700">Descargar como:</span>
+      <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+    </span>
+  </div>  
             <!------------------------TABLE-------------------- -->
             <!------------------------TABLE-------------------- -->
           <div class="mb-10 mt-5">

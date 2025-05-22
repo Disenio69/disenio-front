@@ -3,6 +3,18 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
 <DashboardLayout title="Gestion de inscripción de estudiantes" path='inscripcion de estudiantes' pageTitle='Gestión de usuarios'>
+  <div class="mt-4">
+    <span class="ml-10">Filtros:</span>
+      <select class="appearance-none leading-tight focus:outline-none rounded-3xl bg-gray-300 px-4 py-1.5 text-black text-sm ml-2 mr-0" id="select-career" name="career">
+        <option class="bg-gray-200" value="" disabled selected>año</option>
+        <option class="bg-white text-black focus:outline-none" id="select-option" value="career 1">2025</option>
+        <option class="bg-white text-black focus:outline-none" id="select-option" value="career 2">2024</option>
+    </select>
+    <span class="float-right mr-14">
+      <span class="text-sm text-gray-700">Descargar como:</span>
+      <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+    </span>
+  </div>
             <!------------------------TABLE-------------------- -->
             <!------------------------TABLE-------------------- -->
           <div class="mb-10 mt-5">

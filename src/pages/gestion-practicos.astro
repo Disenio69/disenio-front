@@ -4,69 +4,81 @@ import DropdownButton from "../components/dropdownButton.astro";
 ---
 
 <DashboardLayout title="Gestion de practicos" path="practicos" pageTitle="Prácticos">
-      <DropdownButton buttonText="Seleccionar materia" options={["Matematicas","Calculo"]}></DropdownButton>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-practico">Seleccionar carpeta</a>
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Prácticos cargados</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Calificación</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Corregir</button>
-                        </td>
-                      </tr>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          43065607
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Jorgito Serenito
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          8.00
-                        </td>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+  <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0" id="select-career" name="career">
+      <option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>
+      <option class="bg-white text-black focus:outline-none" id="select-option" value="career 1">Peluqueria</option>
+      <option class="bg-white text-black focus:outline-none" id="select-option" value="career 2">Carpinteria</option>
+  </select>
+    <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0 overflow-x-hidden" id="select-folder" name="folder"><!--Deberia ocultarse hasta seleccionar el curso -->
+      <option class="bg-gray-200" value="" disabled selected>Seleccionar carpeta</option>
+      <option class="bg-white text-black focus:outline-none" id="select-option" value="folder 1">Trabajo practico 1</option>
+      <option class="bg-white text-black focus:outline-none" id="select-option" value="folder 2">Trabajo practico sobre tinte de pelo</option>
+  </select>
+  <span class="float-right mr-14">
+    <span class="text-sm text-gray-700">Descargar como:</span>
+    <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+  </span>
+  <!------------------------TABLE-------------------- -->
+  <!------------------------TABLE-------------------- -->
+  <div class="mb-10 mt-5">
+    <div class="xl:w-full px-10">
+      <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
+        <div class="rounded-t mb-0 px-4 py-3 border-0">
+          <div class="flex flex-wrap items-center">
+            <div class="relative w-full px-2 flex-grow flex-1">
+              <h3 class="font-semibold text-base text-blueGray-700">Prácticos cargados</h3>
+            </div>
+            <div class="relative flex-grow flex-1 sm:text-right">
+              <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
+              <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+            </div>
           </div>
+        </div>
+    
+        <div class="block w-full overflow-x-auto">
+          <table class="items-center bg-transparent w-full border-collapse ">
+            <thead>
+              <tr>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Estado</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
+              </tr>
+            </thead>
+    
+            <tbody>
+              <tr>
+                <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
+                  43065607
+                </th>
+                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                  Jorgito Serenito
+                </td>
+                <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                  Sin corregir
+                </td>
+                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Corregir</button>
+                </td>
+              </tr>
+              <tr>
+                <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
+                  43065607
+                </th>
+                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                  Jorgito Serenito
+                </td>
+                <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
+                  Aprobado
+                </td>
+                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                  <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+  </div>
 </DashboardLayout>
 

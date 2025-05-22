@@ -2,9 +2,13 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Gestion de aulas y horarios' path='aulas y horarios' pageTitle='Gestión de aulas y horarios'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Agregar aula y horario</a>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Ver calendario</a>
+<DashboardLayout title='Gestionar de aulas y horarios' path='aulas y horarios' pageTitle='Gestionar de aulas y horarios'>
+      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-aula-y-horario">Agregar aula y horario</a>
+      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/">Ver horarios asignados</a>
+      <span class="float-right mr-14">
+        <span class="text-sm text-gray-700">Descargar como:</span>
+        <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+      </span>
             <!------------------------TABLE-------------------- -->
             <!------------------------TABLE-------------------- -->
           <div class="mb-10 mt-5">
