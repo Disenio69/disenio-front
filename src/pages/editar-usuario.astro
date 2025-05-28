@@ -4,17 +4,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <DashboardLayout title='Cargar un nuevo usuario' path='Agregar nuevo usuario' pageTitle='Agregar nuevo usuario'>
     <form id="form-user-add" class="w-full pl-16 pr-16 mt-6">
-      <div class="w-full md:w-1/3 ml-6 pr-8 mb-6 input">
-        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-firsh-name">
-          Tipo de usuario
-        </label>
-        <select class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="typeOfUser" name="typeOfUser">
-          <option value="" disabled selected>-- Selecciona una opción --</option>
-          <option id="select-option" value="personal">Personal institucional</option>
-          <option id="select-option" value="estudiante">Estudiante</option>
-        </select>
-      </div> 
-      
       <div class="flex flex-wrap mx-3 mb-6">
           
           <div class="w-full md:w-1/3 px-3 mb-6 input hidden">
@@ -128,147 +117,156 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 </DashboardLayout>
 
 <script>
-import {Notification} from "../components/notifications.js"
-import { 
-  verifyInputOnlyLetters, verifyInputOnlyNumbers, verifyInputDate, 
-  verifyInputWithSimbols, verifyInputEmail, resetError, hasError 
-} from '../components/inputVerification.ts'
+import { Notification } from "../components/notifications.js"
+import {
+  error,
+  verifyInputOnlyLetters,
+  verifyInputDate,
+  verifyInputOnlyNumbers,
+  verifyInputWithSimbols,
+  verifyInputEmail
+} from "../components/inputVerification.ts"
 
-  const btnSubmit = document.querySelector("#form-submit") as HTMLButtonElement
-  btnSubmit.disabled = true
-  let isStudent = false
+let isStudent = false;
+let currentId: number | null = null;
 
-  document.querySelector('#typeOfUser')?.addEventListener("change",()=>{
-    const selectValue = (document.getElementById("typeOfUser") as HTMLSelectElement)?.value
-    const inputsEst = document.querySelectorAll('.input-student') as NodeListOf<HTMLInputElement>
-    const inputsAll = document.querySelectorAll('.input') as NodeListOf<HTMLInputElement>
+const btnSubmit = document.querySelector("#form-submit") as HTMLButtonElement;
+btnSubmit.disabled = true;
 
-    btnSubmit.disabled = false
-    btnSubmit?.classList.remove("bg-gray-500")
-    btnSubmit?.classList.add("bg-blue-500", "hover:bg-blue-700", "focus:outline-none", "focus:shadow-outline")
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.querySelector("#form-user-add") as HTMLFormElement;
+  const params = new URLSearchParams(window.location.search);
+  const idParam = params.get("id");
+  const tipoParam = params.get("tipo"); // "alumno" o "personal"
 
-    Notification.prototype.deletePreviousNotification()
+  const inputsAll = document.querySelectorAll('.input') as NodeListOf<HTMLElement>;
+  const inputsEst = document.querySelectorAll('.input-student') as NodeListOf<HTMLElement>;
 
-    if(selectValue==="estudiante"){
-      inputsEst.forEach(input => {
-        input.classList.remove('hidden')
-        isStudent = true
-      })
-      inputsAll.forEach(input =>{
-        input.classList.remove('hidden')
-      })
+  const name = document.querySelector("#input-firstName") as HTMLInputElement;
+  const lastName = document.querySelector("#input-lastName") as HTMLInputElement;
+  const birthDay = document.querySelector("#input-birthday") as HTMLInputElement;
+  const dni = document.querySelector("#input-dni") as HTMLInputElement;
+  const password = document.querySelector("#input-password") as HTMLInputElement;
+  const email = document.querySelector("#input-email") as HTMLInputElement;
+  const phone = document.querySelector("#input-phone") as HTMLInputElement;
+  const occupation = document.querySelector("#input-occupation") as HTMLInputElement;
+  const nationality = document.querySelector("#input-nationality") as HTMLInputElement;
+  const residence = document.querySelector("#input-residence") as HTMLInputElement;
+  const studyLevel = document.querySelector("#input-studyLevel") as HTMLInputElement;
+  const disability = document.querySelector("#input-disability") as HTMLInputElement;
+  const socialProgram = document.querySelector("#input-socialProgram") as HTMLInputElement;
+  const estadoCivil = document.querySelector("#input-social") as HTMLInputElement;
+
+  function showInputs(isAlumno: boolean) {
+    inputsAll.forEach(input => input.classList.remove("hidden"));
+    if (isAlumno) {
+      inputsEst.forEach(input => input.classList.remove("hidden"));
+    } else {
+      inputsEst.forEach(input => input.classList.add("hidden"));
     }
-    else{
-      inputsEst.forEach(input => {
-        input.classList.add('hidden')
-        isStudent = false
-      })
-      inputsAll.forEach(input =>{
-        input.classList.remove('hidden')
-      })
-    }
-  })
-  
-      document.addEventListener("DOMContentLoaded", () => {
-      const form = document.querySelector("#form-user-add");
-        if (form) {
-          form.addEventListener("submit", async function(event) {
-            event.preventDefault();
+    btnSubmit.disabled = false;
+    btnSubmit.classList.remove("bg-gray-500");
+    btnSubmit.classList.add("bg-blue-500");
+    btnSubmit.textContent = "Guardar cambios";
+  }
 
-            const name = (document.querySelector("#input-firstName") as HTMLInputElement)
-            const lastName = (document.querySelector("#input-lastName") as HTMLInputElement)
-            const birthDay = (document.querySelector("#input-birthday") as HTMLInputElement)
-            const dni = (document.querySelector("#input-dni") as HTMLInputElement)
-            const password = (document.querySelector("#input-password") as HTMLInputElement)
-            const email = (document.querySelector("#input-email") as HTMLInputElement)
-            const phone = (document.querySelector("#input-phone") as HTMLInputElement)
-            const occupation = (document.querySelector("#input-occupation") as HTMLInputElement)
-            const nationality = (document.querySelector("#input-nationality") as HTMLInputElement)
-            const residence = (document.querySelector("#input-residence") as HTMLInputElement)
-            const studyLevel = (document.querySelector("#input-studyLevel") as HTMLInputElement)
-            const disability = (document.querySelector("#input-disability") as HTMLInputElement)
-            const socialProgram = (document.querySelector("#input-socialProgram") as HTMLInputElement)
-            const estadocivil = (document.querySelector("#input-social") as HTMLInputElement)
-            
-            Notification.prototype.deletePreviousNotification()
+  // Validar que se pasaron los dos parámetros por URL
+  if (idParam && tipoParam) {
+    currentId = Number(idParam);
+    isStudent = tipoParam === "alumno";
 
-            // Antes de empezar validaciones:
-            // resetError()
-
-            // verifyInputOnlyLetters(name, 4, 20)
-            // verifyInputOnlyLetters(lastName, 4, 20)
-            // verifyInputDate(birthDay)
-            // verifyInputOnlyNumbers(dni, 8, 8)
-            // verifyInputWithSimbols(password, 4, 20)
-            // verifyInputEmail(email, 3, 100)
-            // verifyInputOnlyNumbers(phone, 0, 13)
-            // verifyInputOnlyLetters(occupation, 4, 100)
-            // verifyInputOnlyLetters(nationality, 4, 30)
-            // verifyInputOnlyLetters(studyLevel, 4, 30)
-            // verifyInputWithSimbols(residence, 4, 30)
-            // verifyInputOnlyLetters(disability, 4, 30)
-            // verifyInputWithSimbols(socialProgram, 4, 30)
-            // verifyInputOnlyLetters(estadocivil, 4, 20)
-
-              let formData = {}
-              if (isStudent) {
-                formData = {
-                  telefono: phone.value,
-                  nacionalidad: nationality.value,
-                  domicilio: residence.value,
-                  ocupacion: occupation.value,
-                  programa_social: socialProgram.value,
-                  discapacidad: disability.value,
-                  nivel_estudio: studyLevel.value,
-                  nombre: name.value,
-                  apellido: lastName.value,
-                  contrasena: password.value,
-                  fecha_nacimiento: birthDay.value,
-                  correo: email.value,
-                  dni: dni.value,
-                  estado_civil: estadocivil.value
-                };
-              } else {
-                formData = {
-                  ocupacion: occupation.value,
-                  nombre: name.value,
-                  apellido: lastName.value,
-                  contrasena: password.value,
-                  fecha_nacimiento: birthDay.value, 
-                  correo: email.value,
-                  dni: dni.value,
-                  telefono: phone.value
-                };
-              }
-
-              try {
-                console.log("formData enviado a /api/personal:", formData);
-                const endpoint = isStudent
-                  ? "http://localhost:4000/api/alumno"
-                  : "http://localhost:4000/api/personal";
-
-                const response = await fetch(endpoint, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify(formData),
-                });
-
-                if (!response.ok) throw new Error("Error al enviar los datos");
-
-                const result = await response.json();
-                alert(isStudent ? "Alumno agregado correctamente" : "Personal agregado correctamente");
-
-                const form = document.querySelector('#form-user-add') as HTMLFormElement;
-                form.reset();
-              } catch (error) {
-                alert("Error: " + (error instanceof Error ? error.message : String(error)));
-              }
-            
-          });
+    const endpoint = `http://localhost:4000/api/${tipoParam}/${idParam}`;
+    
+    fetch(endpoint)
+    .then(res => res.json())
+    .then(data => {
+        const usuario = (data.body ?? [])[0];
+        if (!usuario) {
+        alert("No se encontró el usuario.");
+        return;
         }
+
+        showInputs(isStudent);
+
+        name.value = usuario.nombre ?? "";
+        lastName.value = usuario.apellido ?? "";
+        birthDay.value = usuario.fecha_nacimiento?.split("T")[0] ?? "";
+        dni.value = usuario.dni ?? "";
+        password.value = usuario.contrasena ?? "";
+        email.value = usuario.correo ?? "";
+        phone.value = usuario.telefono ?? "";
+        occupation.value = usuario.ocupacion ?? "";
+
+        if (isStudent) {
+        nationality.value = usuario.nacionalidad ?? "";
+        residence.value = usuario.domicilio ?? "";
+        studyLevel.value = usuario.nivel_estudio ?? "";
+        disability.value = usuario.discapacidad ?? "";
+        socialProgram.value = usuario.programa_social ?? "";
+        estadoCivil.value = usuario.estado_civil ?? "";
+        }
+    })
+    .catch(err => {
+        alert("No se pudo cargar el usuario.");
+        console.error(err);
     });
 
+  }
 
-  </script>
+  // Envío del formulario (PUT)
+  if (form) {
+    form.addEventListener("submit", async (event: Event) => {
+      event.preventDefault();
+
+      const formData = isStudent
+        ? {
+            telefono: phone.value,
+            nacionalidad: nationality.value,
+            domicilio: residence.value,
+            ocupacion: occupation.value,
+            programa_social: socialProgram.value,
+            discapacidad: disability.value,
+            nivel_estudio: studyLevel.value,
+            nombre: name.value,
+            apellido: lastName.value,
+            contrasena: password.value,
+            fecha_nacimiento: birthDay.value,
+            correo: email.value,
+            dni: dni.value,
+            estado_civil: estadoCivil.value
+          }
+        : {
+            ocupacion: occupation.value,
+            nombre: name.value,
+            apellido: lastName.value,
+            contrasena: password.value,
+            fecha_nacimiento: birthDay.value,
+            correo: email.value,
+            dni: dni.value,
+            telefono: phone.value
+          };
+
+      try {
+        const endpoint = `http://localhost:4000/api/${tipoParam}/${currentId}`;
+        const response = await fetch(endpoint, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) throw new Error("Error al enviar los datos");
+
+        alert(isStudent ? "Alumno actualizado" : "Personal actualizado");
+        form.reset();
+        window.location.href = "/gestion-de-usuarios";
+      } catch (error) {
+        alert("Error: " + (error instanceof Error ? error.message : String(error)));
+      }
+    });
+  }
+});
+
+
+</script>
