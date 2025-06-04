@@ -129,10 +129,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <script>
 import {Notification} from "../components/notifications.js"
-import { 
-  verifyInputOnlyLetters, verifyInputOnlyNumbers, verifyInputDate, 
-  verifyInputWithSimbols, verifyInputEmail, resetError, hasError 
-} from '../components/inputVerification.ts'
 
   const btnSubmit = document.querySelector("#form-submit") as HTMLButtonElement
   btnSubmit.disabled = true

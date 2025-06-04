@@ -77,14 +77,14 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
   //@ts-nocheck 
   import { moreInfoRow } from '../components/moreInfoRow'
 
+  //VARIABLES
   let data = null
   const limitcolums = 5
   const pag = 0
-
+  let filteredData = null
+  let currentStart = 0
+  let currentEnd = currentStart + limitcolums
   
-  document.querySelector('#nextPage')?.addEventListener('click',nextPage)
-  document.querySelector('#previousPage')?.addEventListener('click',previousPage)
-
   document.querySelector('#tbody').addEventListener('click', async function(e) { // Funcion que despliega la ventana modal de mas informacion
   if (e.target && e.target.id.startsWith('MoreInfo')) {
     const targetDni = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML) //Comprobar esto luego ya que saco el "dni" del html y eso uso para mostrar los datos
@@ -205,28 +205,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
       document.getElementById('modal')?.remove()  // Elimina el modal del DOM
   }
 
-  function checkButtonDisponibility(prev,next,total){
-    const prePagButton = document.querySelector('#previousPage')
-    const nextPagButton = document.querySelector('#nextPage')
-    if(prev === 0){
-      prePagButton.classList.add('disable-button')
-      prePagButton.classList.remove('hover:bg-gray-900')
-    }
-    else{
-      prePagButton.classList.remove('disable-button')
-      prePagButton.classList.add('hover:bg-gray-900')
-    }
-
-    if(next === total){
-      nextPagButton.classList.add('disable-button')
-      nextPagButton.classList.remove('hover:bg-gray-900')
-    }
-    else{
-      nextPagButton.classList.remove('disable-button')
-      nextPagButton.classList.add('hover:bg-gray-900')
-    }
-
-  }
 async function fetchData(){
     if(!data){
       const responseStudent = await fetch('http://localhost:4000/api/alumno')
@@ -246,175 +224,57 @@ async function fetchData(){
     return data
 }
 
-  //Fetch inicial para mostrar los datos de la tabla
-(async function loadData(){
+async function loadData(){
     let tableContent =document.querySelector('#tbody')
     if(tableContent.rows.length === 0){
       data = await fetchData()
-      
-      for (let i = 0; i < Math.min(limitcolums, data.length); i++) {
-        tableContent.innerHTML +=`<tr>
-                                  <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${data[i].dni}</td>
-                                  <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${data[i].nombre}</td>
-                                  <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${data[i].apellido}</td>
-                                  <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${data[i].tipo}</td>
-                                  <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <span>
-                                    <button id="MoreInfo" class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
-                                    <a href="/editar-usuario?id=${encodeURIComponent(data[i].id)}&tipo=${encodeURIComponent(data[i].tipo)}" 
-                                      class="inline-block rounded-3xl bg-sky-400 w-6 h-6 text-center align-middle">
-                                      <i class="fa-solid fa-pen-to-square text-xs leading-6" style="color: #000000;"></i>
-                                    </a>
-                                    <button id="deleteButton" data-id="${data[i].id}"  class="rounded-3xl bg-red-600 w-6 h-6 text-black">x</button>
-                                  </span>
-                                  </td>
-                                </tr>`
-      }
+      renderPage()
     }
-
-    const paginationStart = document.querySelector('#paginationStart').innerHTML = 0
-    const paginationEnd = document.querySelector('#paginationEnd').innerHTML = limitcolums
-    const totalPagination = document.querySelector('#totalPagination').innerHTML = data.length
-
-    checkButtonDisponibility(0,limitcolums,data.length)
-})()
-
-async function nextPage() {
-  const paginationStart = document.querySelector('#paginationStart')
-  const paginationEnd = document.querySelector('#paginationEnd')
-  const totalPagination = document.querySelector('#totalPagination')
-  const tableContent = document.querySelector("#tbody")
-
-  let pagStartValue = parseInt(paginationStart.innerHTML)
-  let pagEndValue = parseInt(paginationEnd.innerHTML)
-  const totalPagValue = parseInt(totalPagination.innerHTML)
-
-  const newStart = pagStartValue + limitcolums
-  let newEnd = pagEndValue + limitcolums
-
-  if (newStart >= totalPagValue || data.length === 0) return
-
-  if (newEnd > totalPagValue) newEnd = totalPagValue
-
-  paginationStart.innerHTML = newStart
-  paginationEnd.innerHTML = newEnd
-  tableContent.innerHTML = ""
-
-  for (let i = newStart; i < newEnd; i++) {
-    const user = data[i]
-    tableContent.innerHTML += `
-      <tr>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${user.dni}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${user.nombre}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${user.apellido}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${user.tipo}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-        <span>
-          <button id="MoreInfo" class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
-          <a href="/editar-usuario?id=${encodeURIComponent(data[i].id)}&tipo=${encodeURIComponent(data[i].tipo)}" 
-            class="inline-block rounded-3xl bg-sky-400 w-6 h-6 text-center align-middle">
-            <i class="fa-solid fa-pen-to-square text-xs leading-6" style="color: #000000;"></i>
-          </a>
-          <button id="deleteButton" data-id="${data[i].id}"  class="rounded-3xl bg-red-600 w-6 h-6 text-black">x</button>
-        </span>
-        </td>
-      </tr>`
-  }
-
-  checkButtonDisponibility(newStart, newEnd, totalPagValue)
 }
 
-async function previousPage() {
-  const paginationStart = document.querySelector('#paginationStart')
-  const paginationEnd = document.querySelector('#paginationEnd')
-  const totalPagination = document.querySelector('#totalPagination')
-  const tableContent = document.querySelector("#tbody")
+//Cargar tabla al iniciar
+addEventListener('DOMContentLoaded',()=> loadData())
 
-  const currentStart = parseInt(paginationStart.innerHTML)
-  const currentEnd = parseInt(paginationEnd.innerHTML)
-
-  const newStart = currentStart - limitcolums
-  const newEnd = currentStart
-
-  // Validación para evitar índice negativo
-  if (newStart < 0 || data.length === 0) return
-
-  // Vaciar la tabla
-  tableContent.innerHTML = ""
-
-  // Actualizar paginación visual
-  paginationStart.innerHTML = newStart
-  paginationEnd.innerHTML = newEnd
-
-  // Mostrar los datos del rango
-  for (let i = newStart; i < newEnd; i++) {
-    tableContent.innerHTML += `
-      <tr>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${data[i].dni}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${data[i].nombre}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${data[i].apellido}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${data[i].tipo}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-        <span>
-          <button id="MoreInfo" class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Más Información</button>
-          <a href="/editar-usuario?id=${encodeURIComponent(data[i].id)}&tipo=${encodeURIComponent(data[i].tipo)}" 
-            class="inline-block rounded-3xl bg-sky-400 w-6 h-6 text-center align-middle">
-            <i class="fa-solid fa-pen-to-square text-xs leading-6" style="color: #000000;"></i>
-          </a>
-          <button id="deleteButton" data-id="${data[i].id}"  class="rounded-3xl bg-red-600 w-6 h-6 text-black">x</button>
-        </span>
-        </td>
-      </tr>`
-  }
-
-  checkButtonDisponibility(newStart, newEnd, parseInt(totalPagination.innerHTML))
-}
-
-
-let filteredData = null
-let currentStart = 0
-
-document.addEventListener('DOMContentLoaded', () => {
-  const inputBusquedaDNI = document.querySelector('#search-by-dni')
-  const tableContent = document.querySelector("#tbody")
-  const btnNext = document.querySelector('#nextPage')
-  const btnPrev = document.querySelector('#previousPage')
-
-  inputBusquedaDNI.addEventListener('keyup', () => {
-    const filtro = inputBusquedaDNI.value.trim()
-    currentStart = 0
-
-    if (filtro === "") {
-      filteredData = null
-    } else {
-      filteredData = data.filter(item =>
-        String(item.dni).startsWith(filtro)
-      )
-    }
-
-    renderPage()
-  })
-
+  const btnNext = document.querySelector('#nextPage') as HTMLButtonElement
   btnNext.addEventListener('click', () => {
-    const currentData = filteredData || data
-    if (currentStart + limitcolums < currentData.length) {
+    if (currentStart + limitcolums < data.length) {
       currentStart += limitcolums
+      currentEnd = Math.min(currentStart + limitcolums, data.length)
       renderPage()
     }
   })
-
+  
+  const btnPrev = document.querySelector('#previousPage') as HTMLButtonElement
   btnPrev.addEventListener('click', () => {
     if (currentStart - limitcolums >= 0) {
       currentStart -= limitcolums
+      currentEnd = currentStart + limitcolums
       renderPage()
     }
   })
 
-  function renderPage() {
-    const currentData = Array.isArray(filteredData) ? filteredData : (Array.isArray(data) ? data : [])
+function checkButton(){
+  btnPrev.disabled = currentStart === 0
+  btnNext.disabled = !Array.isArray(data) || currentStart + limitcolums >= data.length
+
+  btnPrev.classList.toggle('disable-button', btnPrev.disabled)
+  btnPrev.classList.toggle('hover:bg-gray-900', !btnPrev.disabled)
+  btnNext.classList.toggle('disable-button', btnNext.disabled)
+  btnNext.classList.toggle('hover:bg-gray-900', !btnNext.disabled)
+
+  const pStart = document.querySelector('#paginationStart')
+  const pEnd = document.querySelector('#paginationEnd')
+  const pTotal = document.querySelector('#totalPagination')
+  pStart.innerHTML = currentStart + 1 // para que no muestre "0"
+  pEnd.innerHTML = Math.min(currentEnd, data.length)
+  pTotal.innerHTML = data.length
+}
+
+function renderPage(currentData = data) {
+    const tableContent = document.querySelector('#tbody')
     tableContent.innerHTML = ""
 
-    const paginated = currentData.slice(currentStart, currentStart + limitcolums)
+    const paginated = currentData.slice(currentStart, currentEnd)
 
     paginated.forEach(item => {
       tableContent.innerHTML += `<tr>
@@ -435,31 +295,24 @@ document.addEventListener('DOMContentLoaded', () => {
       </tr>`
     })
 
- if (currentStart === 0) {
-        btnPrev.disabled = true
-        btnPrev.classList.add('disable-button')
-        btnPrev.classList.remove('hover:bg-gray-900')
-      } else {
-        btnPrev.disabled = false
-        btnPrev.classList.remove('disable-button')
-        btnPrev.classList.add('hover:bg-gray-900')
-      }
-
-      if (currentStart + limitcolums >= currentData.length) {
-        btnNext.disabled = true
-        btnNext.classList.add('disable-button')
-        btnNext.classList.remove('hover:bg-gray-900')
-      } else {
-        btnNext.disabled = false
-        btnNext.classList.remove('disable-button')
-        btnNext.classList.add('hover:bg-gray-900')
-      }
+    checkButton()
   }
 
-  // Render inicial
-  renderPage()
-})
-
+  // Busqueda por dni
+  const inputBusquedaDNI = document.querySelector('#search-by-dni')
+  inputBusquedaDNI.addEventListener('input', () => {
+    const filtro = inputBusquedaDNI.value.trim()
+    let filteredData = null
+    currentStart = 0
+    
+    if(filtro === ""){
+      renderPage(data)
+    }
+    else{
+      filteredData = data.filter(item => String(item.dni).startsWith(filtro))
+      renderPage(filteredData)
+    }
+  })
 
 document.querySelector('#download-csv')?.addEventListener("click", async () => {
   try {
