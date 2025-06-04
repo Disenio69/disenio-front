@@ -75,6 +75,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <script>
   //@ts-nocheck 
+  import { downloadCsv } from '../components/downloadTable'
   import { moreInfoRow } from '../components/moreInfoRow'
 
   //VARIABLES
@@ -87,7 +88,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
   
   document.querySelector('#tbody').addEventListener('click', async function(e) { // Funcion que despliega la ventana modal de mas informacion
   if (e.target && e.target.id.startsWith('MoreInfo')) {
-    const targetDni = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML) //Comprobar esto luego ya que saco el "dni" del html y eso uso para mostrar los datos
+    const targetDni = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML) 
     let targetuser = '' 
 
     data.forEach(data => {
@@ -298,56 +299,23 @@ function renderPage(currentData = data) {
     checkButton()
   }
 
-  // Busqueda por dni
-  const inputBusquedaDNI = document.querySelector('#search-by-dni')
-  inputBusquedaDNI.addEventListener('input', () => {
-    const filtro = inputBusquedaDNI.value.trim()
-    let filteredData = null
-    currentStart = 0
-    
-    if(filtro === ""){
-      renderPage(data)
-    }
-    else{
-      filteredData = data.filter(item => String(item.dni).startsWith(filtro))
-      renderPage(filteredData)
-    }
-  })
+// Busqueda por dni
+const inputBusquedaDNI = document.querySelector('#search-by-dni')
+inputBusquedaDNI.addEventListener('input', () => {
+  const filtro = inputBusquedaDNI.value.trim()
+  let filteredData = null
+  currentStart = 0
+  
+  if(filtro === ""){
+    renderPage(data)
+  }
+  else{
+    filteredData = data.filter(item => String(item.dni).startsWith(filtro))
+    renderPage(filteredData)
+  }
+})
 
 document.querySelector('#download-csv')?.addEventListener("click", async () => {
-  try {
-    if (!Array.isArray(data) || data.length === 0) {
-      alert("No hay datos para exportar");
-      return;
-    }
-
-    // Campos a excluir del CSV
-    const camposExcluidos = ["contrasena"];
-
-    //Obtener headers filtrando los excluidos
-    const headers = Object.keys(data[0]).filter(h => !camposExcluidos.includes(h));
-
-    //Construir filas CSV sin los campos excluidos
-    const filas = data.map(fila =>
-      headers.map(h => `"${fila[h] ?? ""}"`).join(",")
-    );
-
-    const contenidoCSV = [headers.join(","), ...filas].join("\n");
-
-    //Crear y descargar archivo CSV
-    const blob = new Blob([contenidoCSV], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-
-    link.setAttribute("href", url);
-    link.setAttribute("download", "tabla.csv");
-    link.style.display = "none";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  } catch (err) {
-    alert("Error al descargar CSV");
-    console.error(err);
-  }
+  downloadCsv(data,'tabla-usuarios')
 });
 </script>
