@@ -1,0 +1,128 @@
+---
+import DashboardLayout from '../layouts/Dashboard-Layout.astro';
+---
+
+<DashboardLayout title='Cargar un nuevo usuario' path='Agregar nuevo usuario' pageTitle='Agregar nuevo usuario'>
+    <form id="form-student-add" class="w-full pl-16 pr-16 mt-6"> 
+        <div class="flex flex-wrap mx-3 mb-6">   
+            <div class="w-full md:w-1/3 px-3 mb-6">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-dni">
+                    DNI
+                </label>
+                <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-dni" type="text">
+            </div>
+
+            <div class="w-full md:w-1/3 ml-6 pr-8 mb-6">
+                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2" for="input-class">
+                    Seleccionar clase
+                </label>
+                <select class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="input-class" name="input-class">
+                    <option value="" disabled selected>-- Selecciona una opción --</option>
+                </select>
+            </div> 
+        </div>
+        <div class="flex items-center ml-6">
+            <button id="form-submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded " type="submit">
+                Agregar usuario
+            </button>
+            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/estudiantes-inscriptos">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</DashboardLayout>
+
+<script>
+  import { Notification } from "../components/notifications.js"
+  import * as validation from "../components/validations.ts"
+  import { showModal } from '../components/modal.js'
+
+  let dataStudent: { id: number, dni: number }[] = []
+  let dataClass: { id: number, nombre: string }[] = []
+
+  document.addEventListener("DOMContentLoaded", async () => {
+    const selectCurso = document.querySelector('#input-class') as HTMLSelectElement
+
+    try {
+      const response = await fetch('http://localhost:4000/api/curso')
+      const responseJson = await response.json()
+      dataClass = responseJson.body
+
+      if (!responseJson.error && Array.isArray(dataClass)) {
+        dataClass.forEach((curso: { id: number, nombre: string }) => {
+          const option = document.createElement('option')
+          option.value = String(curso.id)
+          option.textContent = curso.nombre
+          selectCurso.appendChild(option)
+        })
+      } else {
+        alert("No se pudieron cargar los cursos")
+      }
+    } catch (err) {
+      alert(`Error al cargar los cursos: ${err}`)
+    }
+
+    try {
+      const response = await fetch('http://localhost:4000/api/alumno')
+      const responseJson = await response.json()
+      dataStudent = responseJson.body
+    } catch (err) {
+      alert(`Error al cargar los alumnos: ${err}`)
+    }
+
+    const form = document.querySelector("#form-student-add") as HTMLFormElement
+    if (form) {
+      form.addEventListener("submit", async function (event) {
+        event.preventDefault()
+
+        let error = 0
+
+        const dni = document.querySelector("#input-dni") as HTMLInputElement
+        const curso = document.querySelector("#input-class") as HTMLSelectElement
+
+        Notification.prototype.deletePreviousNotification()
+
+        error += validation.checkInputNumbers(dni, 7, 10)
+        error += validation.checkInputSelect(curso)
+
+        if (error === 0) {
+          const dniIngresado = parseInt(dni.value)
+          const cursoSeleccionado = parseInt(curso.value)
+
+          const alumnoEncontrado = dataStudent.find((alumno) => alumno.dni === dniIngresado)
+          const cursoEncontrado = dataClass.find((c) => c.id === cursoSeleccionado)
+
+          if (!alumnoEncontrado || !cursoEncontrado) {
+            showModal("Alumno o curso no encontrado", "Error")
+            return
+          }
+
+          const formData = {
+            id_alumno: alumnoEncontrado.id,
+            id_curso: cursoEncontrado.id
+          }
+
+          try {
+            console.log("formData enviado a /api/curso/asignar-alumno:", formData)
+
+            const response = await fetch("http://localhost:4000/api/curso/asignar-alumno", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify(formData)
+            })
+
+            if (!response.ok) throw new Error("Error al enviar los datos")
+
+            showModal("Alumno asignado al curso con éxito", "Éxito")
+
+            form.reset()
+          } catch (error) {
+            showModal("Error: " + (error instanceof Error ? error.message : String(error)), 'Error')
+          }
+        }
+      })
+    }
+  })
+</script>

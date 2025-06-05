@@ -83,3 +83,13 @@ export function checkInputDate(target:HTMLInputElement){
         return 0
     }
 }
+
+export function checkInputSelect(target:HTMLSelectElement){
+    if (!target.value) {
+    new Notification("Debe seleccionar un curso", 'error', target)
+    return 1
+    }
+    else{
+        return 0
+    }
+}

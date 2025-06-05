@@ -257,7 +257,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
             if (!response.ok) throw new Error("Error al enviar los datos");
 
-            const result = await response.json();
             isStudent? showModal("Alumno agregado con exito",'Éxito') : showModal("Personal agregado con exito",'Éxito')
 
             const form = document.querySelector('#form-user-add') as HTMLFormElement;
