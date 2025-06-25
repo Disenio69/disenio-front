@@ -19,6 +19,22 @@ export function checkInputLetters(target:HTMLInputElement,min:number,max:number)
     
 }
 
+export function checkInputAlphaNumeric(target: HTMLInputElement, min: number, max: number) {
+  const value = target.value.trim()
+
+  if (value.length < min || value.length > max) {
+    new Notification(`Debe tener entre ${min} y ${max} caracteres`, 'error', target)
+    return 1
+  } else {
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9\s]+$/.test(value)) {
+      new Notification("Solo se permiten letras y números", 'error', target)
+      return 1
+    }
+    return 0
+  }
+}
+
+
 export function checkInputNumbers(target:HTMLInputElement,min:number,max:number){
     const value = target.value.trim()
     

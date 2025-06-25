@@ -39,12 +39,19 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
   let dataStudent: { id: number, dni: number }[] = []
   let dataClass: { id: number, nombre: string }[] = []
+  const token = localStorage.getItem('token')
 
   document.addEventListener("DOMContentLoaded", async () => {
     const selectCurso = document.querySelector('#input-class') as HTMLSelectElement
 
     try {
-      const response = await fetch('http://localhost:4000/api/curso')
+      const response = await fetch('http://localhost:4000/api/curso',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
       const responseJson = await response.json()
       dataClass = responseJson.body
 
@@ -63,7 +70,13 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
     }
 
     try {
-      const response = await fetch('http://localhost:4000/api/alumno')
+      const response = await fetch('http://localhost:4000/api/alumno',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
       const responseJson = await response.json()
       dataStudent = responseJson.body
     } catch (err) {
@@ -108,7 +121,8 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             const response = await fetch("http://localhost:4000/api/curso/asignar-alumno", {
               method: "POST",
               headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`
               },
               body: JSON.stringify(formData)
             })

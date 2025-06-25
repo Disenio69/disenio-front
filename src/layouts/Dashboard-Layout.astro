@@ -7,7 +7,6 @@ interface Props {
 }
 
 const { title,path,pageTitle } = Astro.props;
-
 ---
 
 <!doctype html>
@@ -226,39 +225,76 @@ const { title,path,pageTitle } = Astro.props;
         </html>
         
 <script>
-          //Funcionalidad del focus sobre los items del side menu
-          (function focusNavbar(){
-            const currentPage : string = window.location.pathname.split("/").pop() ?? ""
-            focus(currentPage)
-          })()
+  import { jwtDecode } from 'jwt-decode'
 
-          function focus(currentPath: string){
-            const arrayUrls = ['inicio-dashboard','gestion-practicos','gestion-examenes','gestion-notas','desempeno-estudiantil','informacion-cursos','gestion-cursos','gestion-aulas-y-horarios','gestion-de-usuarios','estudiantes-inscriptos','titulacion']
-            
-            arrayUrls.forEach(url =>{
-              if(url == currentPath){
-                document.querySelector('#'+url)?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
-                }
-              })
-            }
+  interface Payload {
+    tipo: string
+    correo: string
+    nombre: string
+    apellido: string
+    id: number
+    iat: number
+    exp: number
+    rol?: string
+  }
 
-          // Funcionalidad del menu para esconderse y mostrarse en resoluciones menores
-          const navbar = document.querySelector(".-translate-x-full")
-        
-          document.querySelector("#display-menu")?.addEventListener("click",()=>{
-            if(navbar?.classList.contains("-translate-x-full")){
-              navbar?.classList.add("+translate-x-full")
-              navbar?.classList.remove("-translate-x-full")
-            }
-            else{
-              navbar?.classList.remove("+translate-x-full")
-              navbar?.classList.add("-translate-x-full")
-            }
-          })
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('token')
 
-          //Mostrar el contenido cuando termina de cargar el contenido
-          document.addEventListener("DOMContentLoaded", function() {
-          document.body.style.visibility = "visible";
+    if (!token) {
+      window.location.href = '/'
+    } else {
+      try {
+        const data = jwtDecode<Payload>(token)
+
+        if (data.tipo !== 'personal') {
+          window.location.href = '/no-autorizado'
+        }
+
+        // Ahora sí verifica correctamente el rol
+        if (data.rol && !['administrador', 'profesor'].includes(data.rol.toLowerCase())) {
+          window.location.href = '/no-autorizado'
+        }
+
+      } catch (e) {
+        window.location.href = '/'
+      }
+    }
+  }
+
+  //Funcionalidad del focus sobre los items del side menu
+  (function focusNavbar(){
+    const currentPage : string = window.location.pathname.split("/").pop() ?? ""
+    focus(currentPage)
+  })()
+
+  function focus(currentPath: string){
+    const arrayUrls = ['inicio-dashboard','gestion-practicos','gestion-examenes','gestion-notas','desempeno-estudiantil','informacion-cursos','gestion-cursos','gestion-aulas-y-horarios','gestion-de-usuarios','estudiantes-inscriptos','titulacion']
+    
+    arrayUrls.forEach(url =>{
+      if(url == currentPath){
+        document.querySelector('#'+url)?.classList.add("bg-blue-500/13","font-semibold","text-slate-700")
+        }
+      })
+    }
+
+  // Funcionalidad del menu para esconderse y mostrarse en resoluciones menores
+  const navbar = document.querySelector(".-translate-x-full")
+  
+  document.querySelector("#display-menu")?.addEventListener("click",()=>{
+    if(navbar?.classList.contains("-translate-x-full")){
+      navbar?.classList.add("+translate-x-full")
+      navbar?.classList.remove("-translate-x-full")
+    }
+    else{
+      navbar?.classList.remove("+translate-x-full")
+      navbar?.classList.add("-translate-x-full")
+    }
+  })
+
+  //Mostrar el contenido cuando termina de cargar el contenido
+  document.addEventListener("DOMContentLoaded", function() {
+  document.body.style.visibility = "visible";
   });
 </script>
 
@@ -296,31 +332,3 @@ body{
 	  background-color: #ddd;
 	}
 </style>
-
-<script>
-	//MENU DESPLEGABLE
-    const  drop = document.querySelector("#dropdownButton")
-    const dropmenu = document.querySelector("#dropdownContent")
-    drop?.addEventListener("click",()=>{
-        if(dropmenu?.classList.contains("hidden")){
-            dropmenu?.classList.remove("hidden")
-        }
-        else
-		{
-			dropmenu?.classList.add("hidden")
-		}
-        })
-    
-    //Mensaje
-    const  dropMessage = document.querySelector("#dropdownButtonMessage")
-    const dropmenuMessage = document.querySelector("#dropdownContentMessage")
-    dropMessage?.addEventListener("click",()=>{
-        if(dropmenuMessage?.classList.contains("hidden")){
-            dropmenuMessage?.classList.remove("hidden")
-        }
-        else
-		{
-			dropmenuMessage?.classList.add("hidden")
-		}
-        })
-</script>

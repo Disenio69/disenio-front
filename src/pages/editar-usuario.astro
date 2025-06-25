@@ -118,17 +118,10 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <script>
 import { Notification } from "../components/notifications.js"
-import {
-  error,
-  verifyInputOnlyLetters,
-  verifyInputDate,
-  verifyInputOnlyNumbers,
-  verifyInputWithSimbols,
-  verifyInputEmail
-} from "../components/inputVerification.ts"
 
 let isStudent = false;
 let currentId: number | null = null;
+const token = localStorage.getItem('token')
 
 const btnSubmit = document.querySelector("#form-submit") as HTMLButtonElement;
 btnSubmit.disabled = true;
@@ -177,7 +170,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const endpoint = `http://localhost:4000/api/${tipoParam}/${idParam}`;
     
-    fetch(endpoint)
+    fetch(endpoint, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
     .then(res => res.json())
     .then(data => {
         const usuario = (data.body ?? [])[0];
@@ -251,7 +250,8 @@ document.addEventListener("DOMContentLoaded", () => {
         const response = await fetch(endpoint, {
           method: "PUT",
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify(formData)
         });

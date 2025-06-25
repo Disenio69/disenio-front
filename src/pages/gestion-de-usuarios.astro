@@ -85,6 +85,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
   let filteredData = null
   let currentStart = 0
   let currentEnd = currentStart + limitcolums
+  const token = localStorage.getItem('token')
   
   document.querySelector('#tbody').addEventListener('click', async function(e) { // Funcion que despliega la ventana modal de mas informacion
   if (e.target && e.target.id.startsWith('MoreInfo')) {
@@ -175,7 +176,8 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         const response = await fetch('http://localhost:4000/api/alumno', {
           method: "PUT", // confirmado por Insomnia
           headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
           },
           body: JSON.stringify({ id: parseInt(id) }) // <- asegúrate que sea un número
         });
@@ -208,8 +210,20 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 async function fetchData(){
     if(!data){
-      const responseStudent = await fetch('http://localhost:4000/api/alumno')
-      const responsePersonnel = await fetch('http://localhost:4000/api/personal')
+      const responseStudent = await fetch('http://localhost:4000/api/alumno',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+      const responsePersonnel = await fetch('http://localhost:4000/api/personal',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
       
       const jsonStudent = await responseStudent.json()
       const jsonPersonnel = await responsePersonnel.json()

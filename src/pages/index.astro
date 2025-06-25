@@ -1,5 +1,4 @@
 ---
-import '../css/style.css';
 ---
 <!doctype html>
 <html lang="en">
@@ -18,20 +17,20 @@ import '../css/style.css';
                     <section class="w-full rounded-6 shadow-2xl p-10 bg-white">
                         <form class="rounded px-8 pt-6 pb-8 mb-4">
                             <div class="mb-8">
-                              <label class="block text-gray-700 text-sm font-bold mb-2" for="dni">Correo</label>
-                              <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="dni" type="text" placeholder="juan@gmail.com">
+                              <label class="block text-gray-700 text-sm font-bold mb-2" for="mail">Correo</label>
+                              <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="mail" type="text" placeholder="juan@gmail.com">
                             </div>
                             <div class="mb-4">
-                              <label class="block text-gray-700 text-sm font-bold mb-2" for="descripcion">Contraseña</label>
-                              <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="descripcion" type="text" placeholder="*************">
+                              <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Contraseña</label>
+                              <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="password" type="text" placeholder="*************">
                             </div>
                             <div class="flex items-center justify-around pt-5 pb-5">
                               <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                                 Iniciar sesión
                               </button>
                               <a class="text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer" href="/examenes-y-materias">
-                                  Olvide mi contraseña
-                                </a>
+                                Olvide mi contraseña
+                              </a>
                             </div>
                           </form>
 
@@ -45,3 +44,50 @@ import '../css/style.css';
             width: 500px;
         }
     </style>
+
+  <script>
+    import * as validation from "../components/validations.ts"
+    import {Notification} from "../components/notifications.js"
+
+    const loginBtn = document.querySelector('button') as HTMLButtonElement
+    const email = document.getElementById('mail') as HTMLInputElement
+    const password = document.getElementById('password') as HTMLInputElement
+
+    loginBtn.addEventListener('click', async () => {
+      const correo = email.value.trim()
+      const contrasena = password.value.trim()
+      let error = 0
+      error += validation.checkInputEmail(email,6,254)
+      error += validation.checkInputPassword(password,4,20)
+
+      if(error === 0){
+        try {
+          const res = await fetch('http://localhost:4000/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ correo, contrasena })
+          })
+
+          const data = await res.json()
+
+          if (!res.ok) {
+            throw new Error(data.body || 'Error desconocido')
+          }
+
+          const token = data.body?.token
+          if (!token) throw new Error('No se recibió token del backend')
+
+          localStorage.setItem('token', token)
+
+          data.body.usuario.tipo === 'personal'?  window.location.href = '/inicio-dashboard' : window.location.href = '/inicio'
+
+        } catch (err) {
+          if (err instanceof Error) {
+            alert('Error de autenticación: ' + err.message)
+          } else {
+            alert('Error desconocido al autenticar')
+          }
+        }
+      }
+    })
+</script>

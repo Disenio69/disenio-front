@@ -136,6 +136,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
   const btnSubmit = document.querySelector("#form-submit") as HTMLButtonElement
   btnSubmit.disabled = true
   let isStudent = false
+  const token = localStorage.getItem('token')
 
   document.querySelector('#typeOfUser')?.addEventListener("change",()=>{
     const selectValue = (document.getElementById("typeOfUser") as HTMLSelectElement)?.value
@@ -242,7 +243,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
           }
 
           try {
-            console.log("formData enviado a /api/personal:", formData);
             const endpoint = isStudent
               ? "http://localhost:4000/api/alumno"
               : "http://localhost:4000/api/personal";
@@ -251,6 +251,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
+                'Authorization': `Bearer ${token}`
               },
               body: JSON.stringify(formData),
             });

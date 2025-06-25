@@ -2,23 +2,23 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title='Información sobre los cursos' path='Información sobre los cursos' pageTitle='Información sobre los cursos vigentes'>
-  <span class="float-right mr-14 mb-6">
-    <span class="text-sm text-gray-700">Descargar como:</span>
-    <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
-  </span>
+<DashboardLayout title="Informacion sobre cursos activos" path='Informacion sobre cursos activos' pageTitle='Informacion sobre cursos activos'>
+      <span class="float-right mr-14">
+        <span class="text-sm text-gray-700">Descargar como:</span>
+        <i id="download-csv" class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+      </span>
             <!------------------------TABLE-------------------- -->
             <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
+          <div id="mainDiv" class="mt-5 pb-5">
             <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
+              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded mb-5">
                 <div class="rounded-t mb-0 px-4 py-3 border-0">
                   <div class="flex flex-wrap items-center">
                     <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Cursos vigentes</h3>
+                      <h3 class="font-semibold text-base text-blueGray-700">Lista de cursos activos</h3>
                     </div>
                     <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
+                      <input id="search-by-name" class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar por nombre">
                       <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
                     </div>
                   </div>
@@ -29,34 +29,171 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                     <thead>
                       <tr>
                         <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Descripción</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Descripcion</th>
                         <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Inscriptos</th>
                         <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Abandonos</th>
                         <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Egresados</th>
                       </tr>
                     </thead>
             
-                    <tbody>
-                      <tr>
-                        <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                          Carpinteria
-                        </th>
-                        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          Carpintear bien chingon
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                          50
-                        </td>
-                        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            2
-                          </td>
-                          <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                            10
-                          </td>
-                      </tr>
+                    <tbody id="tbody">
+                      <!-- Entradas de la tabla -->
                     </tbody>
                   </table>
                 </div>
               </div>
+              <div class="flex flex-col items-center">
+                <!-- Help text -->
+                <span class="text-sm text-gray-700 dark:text-gray-400">
+                    Mostrando <span class="font-semibold text-gray-900 dark:text-white" id="paginationStart"></span> de <span class="font-semibold text-gray-900 dark:text-white" id="paginationEnd"></span> de <span class="font-semibold text-gray-900 dark:text-white" id="totalPagination"></span> entradas
+                </span>
+                <div class="inline-flex mt-2 xs:mt-0">
+                  <!-- Buttons -->
+                  <button id="previousPage" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900">
+                      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
+                      </svg>
+                      Anterior
+                  </button>
+                  <button id="nextPage" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                      Siguiente
+                      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
+                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
           </div>
 </DashboardLayout>
+
+<style>
+  .disable-button{
+    color: gray;
+  }
+</style>
+
+<script>
+  //@ts-nocheck 
+  import { downloadCsv } from '../components/downloadTable'
+  import { moreInfoRow } from '../components/moreInfoRow'
+
+  //VARIABLES
+  let data = null
+  const limitcolums = 5
+  const pag = 0
+  let filteredData = null
+  let currentStart = 0
+  let currentEnd = currentStart + limitcolums
+  const token = localStorage.getItem('token')
+
+  document.querySelector('#mainDiv')?.addEventListener('click', function(e) {
+      if (e.target.id === 'closeModal') {
+          closeModal()
+      }
+  })
+
+  function closeModal() {
+      document.getElementById('modal')?.remove()  // Elimina el modal del DOM
+  }
+
+  async function fetchData(){
+      if(!data){
+        const responseStudentsClass = await fetch('http://localhost:4000/api/curso/resumen',{
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        }
+      })
+        
+        const jsoStudentsClass = await responseStudentsClass.json()
+        
+        data = jsoStudentsClass.body
+      }
+      return data
+  }
+
+  async function loadData(){
+      let tableContent =document.querySelector('#tbody')
+      if(tableContent.rows.length === 0){
+        data = await fetchData()
+        renderPage()
+      }
+  }
+
+  //Cargar tabla al iniciar
+  addEventListener('DOMContentLoaded',()=> loadData())
+
+  const btnNext = document.querySelector('#nextPage') as HTMLButtonElement
+  btnNext.addEventListener('click', () => {
+    if (currentStart + limitcolums < data.length) {
+      currentStart += limitcolums
+      currentEnd = Math.min(currentStart + limitcolums, data.length)
+      renderPage()
+    }
+  })
+  
+  const btnPrev = document.querySelector('#previousPage') as HTMLButtonElement
+  btnPrev.addEventListener('click', () => {
+    if (currentStart - limitcolums >= 0) {
+      currentStart -= limitcolums
+      currentEnd = currentStart + limitcolums
+      renderPage()
+    }
+  })
+
+  function checkButton(){
+    btnPrev.disabled = currentStart === 0
+    btnNext.disabled = !Array.isArray(data) || currentStart + limitcolums >= data.length
+
+    btnPrev.classList.toggle('disable-button', btnPrev.disabled)
+    btnPrev.classList.toggle('hover:bg-gray-900', !btnPrev.disabled)
+    btnNext.classList.toggle('disable-button', btnNext.disabled)
+    btnNext.classList.toggle('hover:bg-gray-900', !btnNext.disabled)
+
+    const pStart = document.querySelector('#paginationStart')
+    const pEnd = document.querySelector('#paginationEnd')
+    const pTotal = document.querySelector('#totalPagination')
+    pStart.innerHTML = currentStart + 1 // para que no muestre "0"
+    pEnd.innerHTML = Math.min(currentEnd, data.length)
+    pTotal.innerHTML = data.length
+  }
+
+  function renderPage(currentData = data) {
+      const tableContent = document.querySelector('#tbody')
+      tableContent.innerHTML = ""
+
+      const paginated = currentData.slice(currentStart, currentEnd)
+
+      paginated.forEach(item => {
+        tableContent.innerHTML += `<tr>
+          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${item.nombre}</td>
+          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.descripcion}</td>
+          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.inscriptos}</td>
+          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.abandonos}</td>
+          <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.egresados}</td>
+        </tr>`
+      })
+
+      checkButton()
+  }
+
+// Busqueda por dni
+const inputSearchName = document.querySelector('#search-by-name')
+inputSearchName.addEventListener('input', () => {
+  const filtro = inputSearchName.value.trim()
+  let filteredData = null
+  currentStart = 0
+  if(filtro === ""){
+    renderPage()
+  }
+  else{
+    filteredData = data.filter(item => item.nombre.toLowerCase().startsWith(filtro.toLowerCase()))
+    renderPage(filteredData)
+  }
+})
+
+document.querySelector('#download-csv')?.addEventListener("click", async () => {
+  downloadCsv(data,'tabla-cursos-activos')
+});
+</script>
