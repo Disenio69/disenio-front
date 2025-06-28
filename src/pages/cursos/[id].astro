@@ -1,0 +1,305 @@
+---
+import MoodleLayout from "../../layouts/Moodle-Layout.astro"
+---
+
+<MoodleLayout title='titulo'>
+  <div class="w-full bg-white shadow-md rounded-xl p-6 text-center">
+    <h1 id="title" class="text-2xl font-semibold text-gray-800">curso nombre</h1>
+  </div>
+
+  <section id="mainContainer" class="w-full bg-white rounded-xl shadow p-6 space-y-8">
+    <select class="appearance-none block bg-gray-300 text-white rounded-xl py-3 px-4 mb-3 leading-tight focus:outline-none" id="add-element" name="add-element">
+      <option value="" disabled selected>-- Agregar elemento --</option>
+      <option value="section">Sección</option>
+      <option value="link">Link (archivo)</option>
+    </select>
+
+    <a href="/inicio" class="flex items-center text-black hover:underline">
+      <span class="mr-1">←</span> Volver al inicio
+    </a>
+
+    <div id="content"></div>
+  </section>
+</MoodleLayout>
+
+<script>
+//@ts-nocheck
+const token = localStorage.getItem('token')
+let secciones = []
+let elementos = []
+let contenidos = ''
+let json = { id: '', json_html: '' }
+
+addEventListener('DOMContentLoaded', async () => {
+  const url = window.location.href
+  const parts = url.split("/")
+  const id = parts[parts.length - 1]
+
+  json.id = id
+  await actualizarContenidos(id)
+  initSelect()
+})
+
+async function actualizarContenidos(id) {
+  await obtenerHTML(id)
+  renderDesdeElementos()
+}
+
+async function obtenerHTML(id) {
+  const res = await fetch(`http://localhost:4000/api/curso_html/curso/${id}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+
+  console.log(res)
+  if (!res.ok) {
+    console.error('Error al obtener HTML')
+    return
+  }
+
+  const data = await res.json()
+  json = { id: data.body.id, json_html: data.body.json_html }
+
+  const tempContainer = document.createElement('div')
+  tempContainer.innerHTML = data.body.json_html
+
+  secciones = Array.from(tempContainer.querySelectorAll('.seccion'))
+  elementos = []
+
+  secciones.forEach((seccion, index) => {
+    const links = seccion.querySelectorAll('a')
+    links.forEach(link => {
+      elementos.push({ seccionId: index, type: 'link', text: link.innerText, link: link.href })
+    })
+  })
+}
+
+async function guardarHTML() {
+  await fetch("http://localhost:4000/api/curso_html/guardar", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    },
+    body: JSON.stringify(json)
+  })
+}
+
+function actualizarJson(contenidos) {
+  json.json_html = contenidos
+  guardarHTML()
+}
+
+function renderDesdeElementos() {
+  const contentDiv = document.getElementById('content')
+  contentDiv.innerHTML = ''
+  contenidos = ''
+
+  secciones.forEach((seccion, index) => {
+    const nuevaSeccion = seccion.cloneNode(true)
+    const contenedorLinks = nuevaSeccion.querySelector('.contenedor-links')
+    if (!contenedorLinks) return
+    contenedorLinks.innerHTML = ''
+
+    elementos.forEach((elemento, elIndex) => {
+      if (elemento.type === 'link' && index === elemento.seccionId) {
+        const spanElement = document.createElement('span')
+        spanElement.classList.add('ml-6', 'flex', 'items-center', 'mb-2')
+
+        const icon = document.createElement('i')
+        icon.className = 'fa-solid fa-file-arrow-down'
+        spanElement.appendChild(icon)
+
+        const linkHTML = document.createElement('a')
+        linkHTML.href = elemento.link
+        linkHTML.innerText = elemento.text
+        linkHTML.target = '_blank'
+        linkHTML.classList.add('ml-2', 'text-blue-600', 'underline', 'hover:text-blue-400')
+        spanElement.appendChild(linkHTML)
+
+        const deleteButton = document.createElement('button')
+        deleteButton.classList.add('ml-2', 'text-red-600')
+        deleteButton.innerText = 'X'
+        deleteButton.addEventListener('click', () => {
+          mostrarModalConfirmacion(() => {
+            elementos.splice(elIndex, 1)
+            renderDesdeElementos()
+          }, '¿Seguro que querés eliminar este enlace?')
+        })
+        spanElement.appendChild(deleteButton)
+
+        contenedorLinks.appendChild(spanElement)
+      }
+    })
+
+    // Limpieza de botones previos
+    const h2 = nuevaSeccion.querySelector('h2')
+    if (h2) {
+      const botonesPrevios = h2.querySelectorAll('button')
+      botonesPrevios.forEach(btn => btn.remove())
+    }
+
+    const deleteSectionBtn = document.createElement('button')
+    deleteSectionBtn.classList.add('ml-2', 'text-red-600', 'font-bold')
+    deleteSectionBtn.innerText = 'X'
+    deleteSectionBtn.addEventListener('click', () => {
+      mostrarModalConfirmacion(() => {
+        secciones.splice(index, 1)
+        elementos = elementos.filter(e => e.seccionId !== index)
+        renderDesdeElementos()
+      }, '¿Seguro que querés eliminar esta sección y sus elementos?')
+    })
+    h2?.appendChild(deleteSectionBtn)
+
+    contentDiv.appendChild(nuevaSeccion)
+  })
+
+  contenidos = contentDiv.innerHTML
+  actualizarJson(contenidos)
+}
+
+function initSelect() {
+  const select = document.getElementById('add-element')
+  if (!select) return
+
+  select.onchange = () => {
+    const value = select.value
+    if (value === 'section') mostrarModalSeccion()
+    if (value === 'link') mostrarModalLinkConArchivo()
+  }
+}
+
+function mostrarModalConfirmacion(callback, mensaje) {
+  const div = document.createElement('DIV')
+  div.innerHTML = `
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+        <button id='closeModal' class="absolute top-2 right-3 text-gray-500 hover:text-black text-lg">&times;</button>
+        <h2 class="text-xl font-semibold text-gray-800">${mensaje}</h2>
+        <div class="flex justify-end gap-4">
+          <button id="cancel" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
+          <button id="confirm" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Eliminar</button>
+        </div>
+      </div>
+    </div>
+  `
+  document.body.appendChild(div)
+
+  document.getElementById('closeModal').addEventListener('click', () => div.remove())
+  document.getElementById('cancel').addEventListener('click', () => div.remove())
+  document.getElementById('confirm').addEventListener('click', () => {
+    callback()
+    div.remove()
+  })
+}
+
+function mostrarModalSeccion() {
+  const div = document.createElement('DIV')
+  div.innerHTML = `
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+        <button id='closeModal' class="absolute top-2 right-3 text-gray-500 hover:text-black text-lg">&times;</button>
+        <h2 class="text-xl font-semibold text-gray-800">Crear nueva sección</h2>
+        <input id="new-section" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" type="text" placeholder="Nombre de la sección">
+        <button id="create-section" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Crear sección</button>
+      </div>
+    </div>
+  `
+  document.body.appendChild(div)
+
+  document.getElementById('closeModal').addEventListener('click', () => {
+    div.remove()
+    document.getElementById('add-element').value = ''
+  })
+
+  document.getElementById('create-section').addEventListener('click', () => {
+    const value = document.getElementById('new-section').value.trim()
+    if (!value) return
+
+    const newSection = document.createElement('div')
+    newSection.classList.add('seccion', 'p-4', 'border', 'rounded-xl', 'shadow-md')
+    newSection.innerHTML = `<h2 class="text-lg font-semibold mb-2">${value}</h2><div class="contenedor-links"></div>`
+    secciones.push(newSection)
+    renderDesdeElementos()
+    div.remove()
+    document.getElementById('add-element').value = ''
+  })
+}
+
+function mostrarModalLinkConArchivo() {
+  const div = document.createElement('DIV')
+  let options = '<option value="" disabled selected>-- Seleccionar sección --</option>'
+  secciones.forEach((sec, index) => {
+    const h2 = sec.querySelector('h2')
+    let titulo = ''
+
+    if (h2) {
+      for (const node of h2.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) {
+          titulo = node.textContent.trim()
+          break
+        }
+      }
+    }
+
+    if (!titulo) {
+      titulo = `Sección ${index}`
+    }
+
+    options += `<option value="${index}">${titulo}</option>`
+  })
+
+  div.innerHTML = `
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+        <button id='closeModal' class="absolute top-2 right-3 text-gray-500 hover:text-black text-lg">&times;</button>
+        <h2 class="text-xl font-semibold text-gray-800">Cargar archivo</h2>
+        <select id="seccion" class="appearance-none block w-full bg-gray-300 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">${options}</select>
+        <input type="file" id="archivo" class="block w-full text-sm text-gray-700">
+        <button id="guardarArchivo" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar archivo</button>
+      </div>
+    </div>
+  `
+  document.body.appendChild(div)
+
+  document.getElementById('closeModal').addEventListener('click', () => {
+    div.remove()
+    document.getElementById('add-element').value = ''
+  })
+
+  document.getElementById('guardarArchivo').addEventListener('click', async () => {
+    const cursoId = json.id
+    const archivo = document.getElementById('archivo').files[0]
+    const seccionIndex = parseInt(document.getElementById('seccion').value)
+
+    if (!archivo || isNaN(seccionIndex)) {
+      alert('Faltan datos.')
+      return
+    }
+
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    formData.append('curso_id', cursoId)
+    formData.append('observacion', archivo.name)
+
+    const response = await fetch('http://localhost:4000/api/material', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    })
+
+    if (response.ok) {
+      const downloadLink = `http://localhost:4000/api/material/${encodeURIComponent(archivo.name)}`
+      elementos.push({ seccionId: seccionIndex, type: 'link', text: archivo.name, link: downloadLink })
+      renderDesdeElementos()
+      div.remove()
+      document.getElementById('add-element').value = ''
+    } else {
+      alert('Error al guardar el archivo.')
+    }
+  })
+}
+</script>

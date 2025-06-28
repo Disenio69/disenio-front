@@ -225,42 +225,40 @@ const { title,path,pageTitle } = Astro.props;
         </html>
         
 <script>
-  import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 
-  interface Payload {
-    tipo: string
-    correo: string
-    nombre: string
-    apellido: string
-    id: number
-    iat: number
-    exp: number
-    rol?: string
-  }
+interface Payload {
+  ocupacion: string
+  correo: string
+  nombre: string
+  apellido: string
+  id: number
+  iat: number
+  exp: number
+}
 
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token')
+if (typeof window !== 'undefined') {
+  const token = localStorage.getItem('token')
 
-    if (!token) {
-      window.location.href = '/'
-    } else {
-      try {
-        const data = jwtDecode<Payload>(token)
+  if (!token) {
+    window.location.href = '/'
+  } else {
+    try {
+      const data = jwtDecode<Payload>(token)
 
-        if (data.tipo !== 'personal') {
-          window.location.href = '/no-autorizado'
-        }
+      // Verifica ocupacion
+      const ocupacion = data.ocupacion ? data.ocupacion.toLowerCase() : ''
 
-        // Ahora sí verifica correctamente el rol
-        if (data.rol && !['administrador', 'profesor'].includes(data.rol.toLowerCase())) {
-          window.location.href = '/no-autorizado'
-        }
-
-      } catch (e) {
-        window.location.href = '/'
+      if (!['administrador', 'profesor'].includes(ocupacion)) {
+        window.location.href = '/no-autorizado'
       }
+
+    } catch (e) {
+      window.location.href = '/'
     }
   }
+}
+
 
   //Funcionalidad del focus sobre los items del side menu
   (function focusNavbar(){

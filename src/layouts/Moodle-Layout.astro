@@ -63,6 +63,41 @@ import '../css/style.css';
 </html>
 
 <script>
+	import { jwtDecode } from 'jwt-decode'
+
+	interface Payload {
+		tipo: string
+		correo: string
+		nombre: string
+		apellido: string
+		id: number
+		iat: number
+		exp: number
+		rol?: string
+	}
+
+	if (typeof window !== 'undefined') {
+		const token = localStorage.getItem('token')
+
+		if (!token) {
+		window.location.href = '/error'
+		} else {
+		try {
+			const data = jwtDecode<Payload>(token)
+			console.log(data.tipo)
+
+			if (!['profesor', 'administrador', 'alumno'].includes(data.ocupacion.toLowerCase())) {
+				window.location.href = '/error'
+			}
+
+
+		} catch (e) {
+			window.location.href = '/'
+		}
+		}
+	}
+
+
 	//MENU DESPLEGABLE
     const  drop = document.querySelector("#dropdownButton")
     const dropmenu = document.querySelector("#dropdownContent")
