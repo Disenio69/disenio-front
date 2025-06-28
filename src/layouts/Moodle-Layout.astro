@@ -19,9 +19,9 @@ import '../css/style.css';
 		<meta name="generator" content={Astro.generator} />
 		<title>{title}</title>
 	</head>
-	<body class="flex justify-center min-h-screen">
-		<div class="w-full max-w-7xl bg-neutral-100">
-			<nav class="bg-neutral-200 flex flex-wrap items-center justify-between lg:flex-nowrap lg:justify-start" navbar-main navbar-scroll="false">   
+	<body class="flex justify-center bg-gradient-to-br from-blue-100 via-sky-100 to-white min-h-screen">
+		<div class="w-full max-w-7xl">
+			<nav class="bg-white border-b shadow-sm flex flex-wrap items-center justify-between" navbar-main navbar-scroll="false">   
 				<div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
 					<div>
 						<img src="../../public/img/school-icon.png" alt="school icon" class="w-10 ml-5">
@@ -36,7 +36,7 @@ import '../css/style.css';
 								</a>
 							</li>
 							<li class="flex items-center">
-							<div id="dropdownButton" class="py-1 px-2 flex relative rounded-3xl text-black text-sm ml-10 mr-0 text-white bg-slate-900">
+							<div id="dropdownButton" class="py-1 px-2 flex relative rounded-full text-white ml-10 bg-gray-800 hover:bg-gray-700 transition">
 								<button id="buttonText" class="ml-2 mr-3">Juan riquelme</button>
 								<div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-sm border-2 left-0 z-10 text-black">
 									<a href="">Perfil</a>
@@ -50,7 +50,7 @@ import '../css/style.css';
 					</div>
 				</div>
 			</nav>
-			<div class="flex justify-center bg-gray-100 min-h-screen">
+			<div class="flex justify-center bg-gradient-to-b from-gray-200 to-white min-h-screen">
 				<div class="w-full max-w-[1200px] flex flex-col items-center px-4 py-8 space-y-6">
 
 					<!-- Slot u otros componentes -->

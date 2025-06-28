@@ -4,11 +4,11 @@ import MoodleLayout from "../../layouts/Moodle-Layout.astro"
 
 <MoodleLayout title='titulo'>
   <div class="w-full bg-white shadow-md rounded-xl p-6 text-center">
-    <h1 id="title" class="text-2xl font-semibold text-gray-800">curso nombre</h1>
+    <h1 id="titulo" class="text-2xl font-semibold text-gray-800"></h1>
   </div>
 
   <section id="mainContainer" class="w-full bg-white rounded-xl shadow p-6 space-y-8">
-    <select class="appearance-none block bg-gray-300 text-white rounded-xl py-3 px-4 mb-3 leading-tight focus:outline-none" id="add-element" name="add-element">
+    <select class="appearance-none block bg-gray-300 text-white rounded-xl py-3 px-4 mb-3 leading-tight focus:outline-none hidden" id="add-element" name="add-element">
       <option value="" disabled selected>-- Agregar elemento --</option>
       <option value="section">Sección</option>
       <option value="link">Link (archivo)</option>
@@ -29,6 +29,8 @@ let secciones = []
 let elementos = []
 let contenidos = ''
 let json = { id: '', json_html: '' }
+let permisoEdicion = false
+
 
 addEventListener('DOMContentLoaded', async () => {
   const url = window.location.href
@@ -36,13 +38,104 @@ addEventListener('DOMContentLoaded', async () => {
   const id = parts[parts.length - 1]
 
   json.id = id
-  await actualizarContenidos(id)
+  await obtenerTitulo()
+  permisoEdicion = verificarIdentidad()
+  await actualizarContenidos(id,permisoEdicion)
   initSelect()
 })
 
-async function actualizarContenidos(id) {
+async function obtenerTitulo(){
+  const resCurso = await fetch(`http://localhost:4000/api/curso/${json.id}`,{
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!resCurso.ok) {
+    console.error('Error al obtener informacion del curso')
+    return
+  }
+  const dataCurso = await resCurso.json()
+  const titulo = document.getElementById('titulo')
+  console.log("datacurso:",dataCurso)
+  titulo.innerHTML = `${dataCurso.body[0].nombre}`
+} 
+
+async function verificarIdentidad(){
+
+  const payload = await verificarOcupacion()
+  permisoEdicion = await VerificarPermisoAccessoAlCurso(payload)
+  return permisoEdicion
+}
+
+async function VerificarPermisoAccessoAlCurso(payload) {
+  let permisoAcceso = false
+
+  const resProf = await fetch(`http://localhost:4000/api/curso/${json.id}/profesores`,{
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!resProf.ok) {
+    console.error('Error al obtener profesores asignados al curso')
+    return
+  }
+  const dataProf = await resProf.json()
+
+  const resAlumno = await fetch(`http://localhost:4000/api/curso/${json.id}/alumnos-simples`,{
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  if (!resAlumno.ok) {
+    console.error('Error al obtener alumnos asignados al curso')
+    return
+  }
+  const dataAlumno = await resAlumno.json()
+
+  dataProf.body.forEach(prof => {
+    if(prof.id === payload.id){
+      permisoAcceso = true
+      permisoEdicion = true
+      return
+    }
+  });
+
+  dataAlumno.body.forEach(alumno => {
+    if(alumno.id === payload.id){
+      permisoAcceso = true
+      return
+    }
+  });
+
+  if(!permisoAcceso){
+    window.location.href = '/inicio' //redireccion
+  }
+
+  return permisoEdicion
+}
+
+async function verificarOcupacion(){
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  }).join(''))
+  const payload = JSON.parse(jsonPayload)
+  if(payload.ocupacion.toLowerCase() !== 'alumno' && payload.ocupacion.toLowerCase() !== 'profesor' && payload.ocupacion.toLowerCase() !== 'administrador'){
+    window.location.href = '/inicio' //redireccion
+  }
+  return payload
+}
+
+async function actualizarContenidos(id,permisoEdicion) {
   await obtenerHTML(id)
-  renderDesdeElementos()
+  renderDesdeElementos(permisoEdicion)
 }
 
 async function obtenerHTML(id) {
@@ -54,7 +147,6 @@ async function obtenerHTML(id) {
     }
   })
 
-  console.log(res)
   if (!res.ok) {
     console.error('Error al obtener HTML')
     return
@@ -93,7 +185,7 @@ function actualizarJson(contenidos) {
   guardarHTML()
 }
 
-function renderDesdeElementos() {
+function renderDesdeElementos(permiso) {
   const contentDiv = document.getElementById('content')
   contentDiv.innerHTML = ''
   contenidos = ''
@@ -104,7 +196,7 @@ function renderDesdeElementos() {
     if (!contenedorLinks) return
     contenedorLinks.innerHTML = ''
 
-    elementos.forEach((elemento, elIndex) => {
+    elementos.forEach((elemento, Index) => {
       if (elemento.type === 'link' && index === elemento.seccionId) {
         const spanElement = document.createElement('span')
         spanElement.classList.add('ml-6', 'flex', 'items-center', 'mb-2')
@@ -122,10 +214,13 @@ function renderDesdeElementos() {
 
         const deleteButton = document.createElement('button')
         deleteButton.classList.add('ml-2', 'text-red-600')
+        if(!permisoEdicion){
+           deleteButton.classList.add('hidden')
+        }
         deleteButton.innerText = 'X'
         deleteButton.addEventListener('click', () => {
           mostrarModalConfirmacion(() => {
-            elementos.splice(elIndex, 1)
+            elementos.splice(Index, 1)
             renderDesdeElementos()
           }, '¿Seguro que querés eliminar este enlace?')
         })
@@ -144,6 +239,9 @@ function renderDesdeElementos() {
 
     const deleteSectionBtn = document.createElement('button')
     deleteSectionBtn.classList.add('ml-2', 'text-red-600', 'font-bold')
+    if(!permisoEdicion){
+      deleteSectionBtn.classList.add('hidden')
+    }
     deleteSectionBtn.innerText = 'X'
     deleteSectionBtn.addEventListener('click', () => {
       mostrarModalConfirmacion(() => {
@@ -164,6 +262,10 @@ function renderDesdeElementos() {
 function initSelect() {
   const select = document.getElementById('add-element')
   if (!select) return
+
+  if(permisoEdicion){
+    select.classList.remove('hidden')
+  }
 
   select.onchange = () => {
     const value = select.value
@@ -270,36 +372,40 @@ function mostrarModalLinkConArchivo() {
     document.getElementById('add-element').value = ''
   })
 
-  document.getElementById('guardarArchivo').addEventListener('click', async () => {
-    const cursoId = json.id
-    const archivo = document.getElementById('archivo').files[0]
-    const seccionIndex = parseInt(document.getElementById('seccion').value)
+document.getElementById('guardarArchivo').addEventListener('click', async () => {
+  const cursoId = json.id
+  const archivo = document.getElementById('archivo').files[0]
+  const seccionIndex = parseInt(document.getElementById('seccion').value)
 
-    if (!archivo || isNaN(seccionIndex)) {
-      alert('Faltan datos.')
-      return
-    }
+  if (!archivo || isNaN(seccionIndex)) {
+    alert('Faltan datos.')
+    return
+  }
 
-    const formData = new FormData()
-    formData.append('archivo', archivo)
-    formData.append('curso_id', cursoId)
-    formData.append('observacion', archivo.name)
+  const formData = new FormData()
+  formData.append('archivo', archivo)
+  formData.append('curso_id', cursoId)
+  formData.append('observacion', archivo.name)
 
-    const response = await fetch('http://localhost:4000/api/material', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` },
-      body: formData
-    })
-
-    if (response.ok) {
-      const downloadLink = `http://localhost:4000/api/material/${encodeURIComponent(archivo.name)}`
-      elementos.push({ seccionId: seccionIndex, type: 'link', text: archivo.name, link: downloadLink })
-      renderDesdeElementos()
-      div.remove()
-      document.getElementById('add-element').value = ''
-    } else {
-      alert('Error al guardar el archivo.')
-    }
+  const response = await fetch('http://localhost:4000/api/material', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${token}` },
+    body: formData
   })
+
+  if (response.ok) {
+    const data = await response.json()
+    const fileId = data.body.id 
+    const downloadLink = `http://localhost:4000/api/material/descargar/${fileId}`
+
+    elementos.push({ seccionId: seccionIndex, type: 'link', text: archivo.name, link: downloadLink })
+    renderDesdeElementos()
+    div.remove()
+    document.getElementById('add-element').value = ''
+  } else {
+    alert('Error al guardar el archivo.')
+  }
+})
+
 }
 </script>
