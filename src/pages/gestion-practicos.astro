@@ -4,15 +4,11 @@ import DropdownButton from "../components/dropdownButton.astro";
 ---
 
 <DashboardLayout title="Gestion de practicos" path="practicos" pageTitle="Prácticos">
-  <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0" id="select-career" name="career">
+  <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0" id="select-curso" name="curso">
       <option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>
-      <option class="bg-white text-black focus:outline-none" id="select-option" value="career 1">Peluqueria</option>
-      <option class="bg-white text-black focus:outline-none" id="select-option" value="career 2">Carpinteria</option>
   </select>
-    <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0 overflow-x-hidden" id="select-folder" name="folder"><!--Deberia ocultarse hasta seleccionar el curso -->
+    <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0 overflow-x-hidden" id="select-carpeta" name="carpeta"><!--Deberia ocultarse hasta seleccionar el curso -->
       <option class="bg-gray-200" value="" disabled selected>Seleccionar carpeta</option>
-      <option class="bg-white text-black focus:outline-none" id="select-option" value="folder 1">Trabajo practico 1</option>
-      <option class="bg-white text-black focus:outline-none" id="select-option" value="folder 2">Trabajo practico sobre tinte de pelo</option>
   </select>
   <span class="float-right mr-14">
     <span class="text-sm text-gray-700">Descargar como:</span>
@@ -46,39 +42,198 @@ import DropdownButton from "../components/dropdownButton.astro";
               </tr>
             </thead>
     
-            <tbody>
-              <tr>
-                <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                  43065607
-                </th>
-                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                  Jorgito Serenito
-                </td>
-                <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                  Sin corregir
-                </td>
-                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                  <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 rounded-3xl text-white text-xs">Corregir</button>
-                </td>
-              </tr>
-              <tr>
-                <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">
-                  43065607
-                </th>
-                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                  Jorgito Serenito
-                </td>
-                <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">
-                  Aprobado
-                </td>
-                <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                  <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
-                </td>
-              </tr>
+            <tbody id="tbody">
             </tbody>
           </table>
         </div>
       </div>
   </div>
 </DashboardLayout>
+
+<script>
+//@ts-nocheck
+import { jwtDecode } from 'jwt-decode'
+const token = localStorage.getItem('token')
+let payload
+const selectCurso = document.getElementById('select-curso')
+const selectCarpeta = document.getElementById('select-carpeta')
+let cursos = []
+
+document.addEventListener('DOMContentLoaded', async () => {
+  payload = obtenerToken()
+  console.log(payload)
+  await cargarDatos()
+})
+
+function obtenerToken() {
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  }).join(''))
+  payload = JSON.parse(jsonPayload)
+  if (!['alumno', 'profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())) {
+    window.location.href = '/inicio'
+  }
+  return payload
+}
+
+async function cargarDatos() {
+  try {
+    const resCursos = await fetch(`http://localhost:4000/api/curso/personal/${payload.id}/cursos`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!resCursos.ok) {
+      console.error('Error al traer cursos')
+      return
+    }
+
+    const data = await resCursos.json()
+    cursos = data.body
+
+    selectCurso.innerHTML = `<option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>`
+
+    if (cursos.length > 0) {
+      cursos.forEach(curso => {
+        const option = document.createElement('option')
+        option.value = curso.id
+        option.innerText = curso.nombre
+        option.classList.add('bg-gray-200')
+        selectCurso.appendChild(option)
+      })
+    }
+
+    selectCurso.addEventListener('change', async (e) => {
+      const cursoSeleccionado = cursos.find(curso => curso.id == e.target.value)
+      if (cursoSeleccionado) {
+        try {
+          const resMateriales = await fetch(`http://localhost:4000/api/material`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${token}`
+            }
+          })
+
+          if (!resMateriales.ok) {
+            console.error('Error al traer los materiales')
+            return
+          }
+
+          const dataMateriales = await resMateriales.json()
+          const materiales = dataMateriales.body
+
+          // Filtrar materiales por curso
+          const materialesCurso = materiales.filter(mat => mat.curso_id == cursoSeleccionado.id)
+
+          // Carpetas únicas
+          const carpetasUnicas = [...new Set(materialesCurso.map(mat => mat.carpeta))]
+
+          // Limpiar select carpeta
+          selectCarpeta.innerHTML = `<option class="bg-gray-200" value="" disabled selected>Seleccionar carpeta</option>`
+          carpetasUnicas.forEach(carpeta => {
+            const option = document.createElement('option')
+            option.value = carpeta
+            option.innerText = carpeta
+            option.classList.add('bg-gray-200')
+            selectCarpeta.appendChild(option)
+          })
+
+          // Evento change carpeta
+          selectCarpeta.addEventListener('change', async (e) => {
+            const carpetaSeleccionada = e.target.value
+            const tbody = document.getElementById('tbody')
+            tbody.innerHTML = ''
+
+            // Filtrar materiales por carpeta
+            const materialesFiltrados = materialesCurso.filter(mat => mat.carpeta === carpetaSeleccionada)
+
+            // Controlar IDs ya insertados
+            const idsInsertados = new Set()
+
+            for (const material of materialesFiltrados) {
+              const alumnoId = material.alumno_id
+              const estado = material.estado
+
+              // Evitar repetidos
+              if (idsInsertados.has(alumnoId)) continue
+
+              const alumnos = await fetchAlumnos(alumnoId)
+              if (!alumnos) continue
+
+              idsInsertados.add(alumnoId)
+
+              // Crear fila
+              alumnos.forEach(alumno => {
+                const tr = document.createElement('tr')
+
+                const thDni = document.createElement('th')
+                thDni.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs'
+                thDni.textContent = alumno.dni
+
+                const tdNombre = document.createElement('td')
+                tdNombre.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
+                tdNombre.textContent = `${alumno.nombre} ${alumno.apellido}`
+
+                const tdEstado = document.createElement('td')
+                tdEstado.className = 'border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
+                tdEstado.textContent = estado || 'Sin corregir'
+
+                const tdOpciones = document.createElement('td')
+                tdOpciones.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4'
+
+                const btn = document.createElement('button')
+                btn.className = 'mr-2 rounded-3xl bg-blue-700 py-1 px-3 text-white text-xs'
+                btn.textContent = 'Corregir'
+
+                tdOpciones.appendChild(btn)
+
+                tr.appendChild(thDni)
+                tr.appendChild(tdNombre)
+                tr.appendChild(tdEstado)
+                tr.appendChild(tdOpciones)
+
+                tbody.appendChild(tr)
+              });
+            }
+          })
+        } catch (error) {
+          console.error(error)
+        }
+      }
+    })
+
+  } catch (error) {
+    console.error('Error en la petición:', error)
+  }
+}
+
+async function fetchAlumnos(alumnoId) {
+  try {
+    const resAlumno = await fetch(`http://localhost:4000/api/alumno/${alumnoId}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!resAlumno.ok) {
+      console.error('Error al traer el alumno')
+      return null
+    }
+
+    const dataAlumno = await resAlumno.json()
+    return dataAlumno.body
+  } catch (error) {
+    console.error(error)
+    return null
+  }
+}
+</script>
 

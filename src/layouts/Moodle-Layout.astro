@@ -30,9 +30,9 @@ import '../css/style.css';
 					<!--left options -->
 					<div class="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
 						<ul class="md:ml-auto md:pr-4 flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
-							<li class="flex items-center">
-								<a href="#" class="block px-0 py-2 text-sm font-semibold text-white transition-all ease-nav-brand">
-									<i class="fa-solid fa-message" style="color: black;"></i>
+							<li id="dashboard" class="flex items-center hidden">
+								<a href="/inicio-dashboard" class="flex relative text-black ml-10 underline hover:text-blue-700">
+									Dashboard
 								</a>
 							</li>
 							<li class="flex items-center">
@@ -63,6 +63,7 @@ import '../css/style.css';
 </html>
 
 <script>
+	//@ts-nocheck
 	import { jwtDecode } from 'jwt-decode'
 
 	interface Payload {
@@ -83,11 +84,13 @@ import '../css/style.css';
 		window.location.href = '/error'
 		} else {
 		try {
-			const data = jwtDecode<Payload>(token)
-			console.log(data.tipo)
+			const payload = jwtDecode<Payload>(token)
 
-			if (!['profesor', 'administrador', 'alumno'].includes(data.ocupacion.toLowerCase())) {
+			if (!['profesor', 'administrador', 'alumno'].includes(payload.ocupacion.toLowerCase())) {
 				window.location.href = '/error'
+			}
+			if(payload.ocupacion === 'profesor' ){
+				document.getElementById('dashboard')?.classList.remove('hidden')
 			}
 
 
@@ -95,7 +98,11 @@ import '../css/style.css';
 			window.location.href = '/'
 		}
 		}
+
+		
 	}
+
+	
 
 
 	//MENU DESPLEGABLE
