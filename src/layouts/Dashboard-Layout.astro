@@ -6,7 +6,7 @@ interface Props {
   pageTitle:string;
 }
 
-const { title,path,pageTitle } = Astro.props;
+const { title,path,pageTitle} = Astro.props;
 ---
 
 <!doctype html>
@@ -74,7 +74,7 @@ const { title,path,pageTitle } = Astro.props;
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-file-invoice"></i>
                       </div>
-                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión notas</span>
+                      <span class="ml-1 duration-300 opacity-100 pointer-events-none ease">Gestión de notas</span>
                     </a>
                   </li>
         
@@ -87,11 +87,11 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li> -->
 
-                  <li class="w-full mt-4">
+                  <li class="w-full mt-4 admin">
                     <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">PLAN ACADEMICO</h6>
                   </li>
         
-                  <li class="mt-0.5 w-full">
+                  <li class="mt-0.5 w-full admin">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="informacion-cursos" href="/informacion-cursos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-clipboard"></i>
@@ -100,7 +100,7 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li>
         
-                  <li class="mt-0.5 w-full">
+                  <li class="mt-0.5 w-full admin">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-cursos" href="/gestion-cursos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-book"></i>
@@ -109,7 +109,7 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li>
         
-                  <li class="mt-0.5 w-full">
+                  <li class="mt-0.5 w-full admin">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-aulas-y-horarios" href="/gestion-aulas-y-horarios">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-clock"></i>
@@ -118,11 +118,11 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li>
 
-                  <li class="w-full mt-4">
+                  <li class="w-full mt-4 admin">
                     <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">USUARIOS</h6>
                   </li>
 
-                  <li class="mt-0.5 w-full">
+                  <li class="mt-0.5 w-full admin">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="gestion-de-usuarios" href="/gestion-de-usuarios">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-user"></i>
@@ -131,7 +131,7 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li>
 
-                  <li class="mt-0.5 w-full">
+                  <li class="mt-0.5 w-full admin">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="estudiantes-inscriptos" href="/estudiantes-inscriptos">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-pen"></i>
@@ -140,11 +140,11 @@ const { title,path,pageTitle } = Astro.props;
                     </a>
                   </li>
 
-                  <li class="w-full mt-4">
+                  <li class="w-full mt-4 admin">
                     <h6 class="pl-6 ml-2 text-xs font-bold leading-tight uppercase dark:text-white opacity-60">TITULACIÓN</h6>
                   </li>
 
-                  <li class="mt-0.5 w-full">
+                  <li class="mt-0.5 w-full admin">
                     <a class=" dark:text-white dark:opacity-80 py-2.7 text-sm ease-nav-brand my-0 mx-2 flex items-center whitespace-nowrap px-4 transition-colors rounded-lg" id="titulacion" href="/titulacion">
                       <div class="mr-2 flex h-8 w-8 items-center justify-center rounded-lg bg-center stroke-0 text-center xl:p-2.5">
                         <i class="fa-solid fa-graduation-cap"></i>
@@ -195,11 +195,11 @@ const { title,path,pageTitle } = Astro.props;
                         </a>
                       </li>
                       <li class="flex items-center">
-                        <div id="dropdownButton" class="py-1 px-2 flex relative rounded-3xl text-black text-sm ml-10 mr-0 text-white bg-slate-900">
-                          <button class="ml-2 mr-3">Juan riquelme</button>
+                        <div id="dropdownButton" class="py-1 px-2 flex relative rounded-3xl text-black text-sm ml-10 mr-0 text-white bg-slate-900 hover:bg-slate-700 transition">
+                          <button id="username" class="ml-2 mr-3 w-[120px] overflow-hidden"></button>
                           <div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full rounded-xl left-0 top-12 z-10 text-black">
                             <a href="/perfil">Perfil</a>
-                            <a href="">Cerrar sesión</a>
+                            <a id="cerrarSesion">Cerrar sesión</a>
                           </div>
                           <img src="../../public/img/avatar-femenino.png" alt="" class="w-10">
                         </div>
@@ -231,7 +231,10 @@ const { title,path,pageTitle } = Astro.props;
         </html>
         
 <script>
+//@ts-nocheck
 import { jwtDecode } from 'jwt-decode'
+const inputsAdmin = document.querySelectorAll('.admin')
+console.log(inputsAdmin)
 
 interface Payload {
   ocupacion: string
@@ -243,20 +246,26 @@ interface Payload {
   exp: number
 }
 
+let payload = {}
+const token = localStorage.getItem('token')
+
 if (typeof window !== 'undefined') {
-  const token = localStorage.getItem('token')
 
   if (!token) {
     window.location.href = '/'
   } else {
     try {
-      const data = jwtDecode<Payload>(token)
-
+      payload = jwtDecode<Payload>(token)
+      const username = document.getElementById('username')
+      username.textContent = `${payload.nombre} ${payload.apellido}`
       // Verifica ocupacion
-      const ocupacion = data.ocupacion ? data.ocupacion.toLowerCase() : ''
+      const ocupacion = payload.ocupacion ? payload.ocupacion.toLowerCase() : ''
 
       if (!['administrador', 'profesor'].includes(ocupacion)) {
         window.location.href = '/no-autorizado'
+      }
+      if(!['administrador'].includes(ocupacion)){
+        inputsAdmin.forEach(input => input.classList.add("hidden"))
       }
 
     } catch (e) {
@@ -265,12 +274,12 @@ if (typeof window !== 'undefined') {
   }
 }
 
-
   //Funcionalidad del focus sobre los items del side menu
   (function focusNavbar(){
     const currentPage : string = window.location.pathname.split("/").pop() ?? ""
     focus(currentPage)
-  })()
+  }
+  )()
 
   function focus(currentPath: string){
     const arrayUrls = ['inicio-dashboard','gestion-practicos','gestion-examenes','gestion-notas','desempeno-estudiantil','informacion-cursos','gestion-cursos','gestion-aulas-y-horarios','gestion-de-usuarios','estudiantes-inscriptos','titulacion']
@@ -300,6 +309,30 @@ if (typeof window !== 'undefined') {
   document.addEventListener("DOMContentLoaded", function() {
   document.body.style.visibility = "visible";
   });
+
+  	//MENU DESPLEGABLE
+	const  drop = document.querySelector("#dropdownButton")
+	const dropmenu = document.querySelector("#dropdownContent")
+	drop?.addEventListener("click",()=>{
+		if(dropmenu?.classList.contains("hidden")){
+			dropmenu?.classList.remove("hidden")
+		}
+		else{
+			dropmenu?.classList.add("hidden")
+		}
+		})
+
+		document.addEventListener("click", (e) => {
+		// Si el menú está abierto y el click no fue dentro del menú ni del botón
+		if (!dropmenu?.classList.contains("hidden") && !dropmenu.contains(e.target) && !drop.contains(e.target)) {
+			dropmenu.classList.add("hidden")
+		}
+		})
+  
+  document.getElementById('cerrarSesion').addEventListener('click',()=>{
+    localStorage.removeItem('token')
+    window.location.href = '/'
+  })
 </script>
 
 

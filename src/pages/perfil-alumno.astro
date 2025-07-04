@@ -1,42 +1,42 @@
 ---
-import DashboardLayout from "../layouts/Dashboard-Layout.astro";
+import MoodleLayout from "../layouts/Moodle-Layout.astro";
 ---
 
-<DashboardLayout title="Mi perfil" path="Mi perfil" pageTitle="Mi perfil">
-
-    <div class="pl-10 w-full flex">
-        <div class="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
-          <img id="imagen-perfil" src="../../public/img/usuario-de-perfil.png" alt="" class="object-cover w-full h-full">
+<MoodleLayout title="Mi perfil">
+    <section class="w-full bg-white p-4 rounded-2xl shadow">
+        <div class="pl-10 w-full flex">
+            <div class="w-40 h-40 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+            <img id="imagen-perfil" src="../../public/img/usuario-de-perfil.png" alt="" class="object-cover w-full h-full">
+            </div>
+            <div class="block mt-10 ml-10">
+                <p id="nombre" class="text-black text-4xl mb-2"></p>
+                <p id="ocupacion" class="text-black text-4xl mb-2"></p>
+            </div>
         </div>
-        <div class="block mt-10 ml-10">
-            <p id="nombre" class="text-black text-4xl mb-2"></p>
-            <p id="ocupacion" class="text-black text-4xl mb-2"></p>
+        <div id="datosPersonales" class="pl-10 mt-5">
+            <h2 class="text-2xl mb-5 underline text-blue-800">Datos personales</h2>
         </div>
-    </div>
-    <div id="datosPersonales" class="pl-10 mt-5">
-        <h2 class="text-2xl mb-5 underline text-blue-800">Datos personales</h2>
-    </div>
-    <div class="pl-10 mt-5 inline-block">
-        <h2 class="text-2xl mb-5 underline text-blue-800">Configuracion</h2>
-        <button class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm" id="cambiarDatosPersonales" >Cambiar información personal</button>
-        <button class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm" id="cambiarContrasenia">Cambiar contraseña</button>
-    </div>
-
-</DashboardLayout>
+        <div class="pl-10 mt-5 inline-block">
+            <h2 class="text-2xl mb-5 underline text-blue-800">Configuracion</h2>
+            <button class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm" id="cambiarDatosPersonales" >Cambiar información personal</button>
+            <button class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm" id="cambiarContrasenia">Cambiar contraseña</button>
+        </div>
+    </section>
+</MoodleLayout>
 
 <script>
 //@ts-nocheck
 import {checkInputPassword,checkInputLetters,checkInputEmail,checkInputNumbers} from '../components/validations'
 import {Notification} from '../components/notifications'
-let personal = []
+let alumno = []
 let token = []
 addEventListener('DOMContentLoaded',async ()=>{
-    personal = await obtenerProfesor()
+    alumno = await obtenerAlumno()
     cargarFoto()
-    agregarHTML(personal[0])
+    agregarHTML(alumno[0])
 })
 
-async function obtenerProfesor() {
+async function obtenerAlumno() {
 token = localStorage.getItem('token')
 const base64Url = token.split('.')[1]
   const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
@@ -45,7 +45,7 @@ const base64Url = token.split('.')[1]
   }).join(''))
   const payload = JSON.parse(jsonPayload)
   try {
-    const res = await fetch(`http://localhost:4000/api/personal/${payload.id}`, {
+    const res = await fetch(`http://localhost:4000/api/alumno/${payload.id}`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -56,11 +56,11 @@ const base64Url = token.split('.')[1]
     const data = await res.json()
 
     if (!res.ok) {
-      console.error('Error al obtener profesor:', data)
+      console.error('Error al obtener alumno:', data)
       return null
     }
 
-    console.log('Profesor obtenido:', data.body)
+    console.log('alumno obtenido:', data.body)
     return data.body
   } catch (error) {
     console.error('Error de red:', error)
@@ -68,27 +68,30 @@ const base64Url = token.split('.')[1]
   }
 }
 
-function agregarHTML(personal){
+function agregarHTML(alumno){
     const div = document.createElement('DIV')
-    const username = document.getElementById('username')    
-    username.textContent = `${personal.nombre} ${personal.apellido}`
     div.classList.add('ml-3')
     const nombre = document.getElementById('nombre')
-    nombre.textContent = `${personal.nombre} ${personal.apellido}`
+    nombre.textContent = `${alumno.nombre} ${alumno.apellido}`
     const ocupacion = document.getElementById('ocupacion')
-    ocupacion.textContent = `${personal.ocupacion}` 
-    div.innerHTML=`
-    <p class="text-black text-lg mb-2">Correo: ${personal.correo}</p>
-
-    <p class="text-black text-lg mb-2">DNI: ${personal.dni}</p>
-
-    <p class="text-black text-lg mb-2">Fecha de nacimiento: ${personal.fecha_nacimiento.substring(0, 10)}</p>
-
-    <p class="text-black text-lg mb-2">Teléfono: ${personal.telefono}</p>
+    ocupacion.textContent = `${alumno.ocupacion}` 
+    div.innerHTML = `
+    <p class="text-black text-lg mb-2">Nombre: ${alumno.nombre}</p>
+    <p class="text-black text-lg mb-2">Apellido: ${alumno.apellido}</p>
+    <p class="text-black text-lg mb-2">Correo: ${alumno.correo}</p>
+    <p class="text-black text-lg mb-2">DNI: ${alumno.dni}</p>
+    <p class="text-black text-lg mb-2">Domicilio: ${alumno.domicilio}</p>
+    <p class="text-black text-lg mb-2">Fecha de nacimiento: ${alumno.fecha_nacimiento.substring(0, 10)}</p>
+    <p class="text-black text-lg mb-2">Teléfono: ${alumno.telefono}</p>
+    <p class="text-black text-lg mb-2">Estado civil: ${alumno.estado_civil}</p>
+    <p class="text-black text-lg mb-2">Nacionalidad: ${alumno.nacionalidad}</p>
+    <p class="text-black text-lg mb-2">Nivel de estudio: ${alumno.nivel_estudio}</p>
+    <p class="text-black text-lg mb-2">Ocupación: ${alumno.ocupacion}</p>
+    <p class="text-black text-lg mb-2">Discapacidad: ${alumno.discapacidad}</p>
+    <p class="text-black text-lg mb-2">Programa social: ${alumno.programa_social}</p>
     `
     const datosPers = document.getElementById('datosPersonales')
     datosPers?.appendChild(div)
-
 }
 
 document.getElementById('cambiarContrasenia').addEventListener('click',modalCambiarContraseña)
@@ -163,13 +166,13 @@ async function cambiarDatosPersonales(){
     <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
       <h2 class="text-2xl font-semibold text-black mb-3">Cambiar datos personales</h2>
       <label for="" class="text-black">Nombre:</label>
-      <input type="text" id="nombreInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${personal[0].nombre}">
+      <input type="text" id="nombreInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].nombre}">
       <label for=""class="text-black">Apellido:</label>
-      <input type="text" id="apellidoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${personal[0].apellido}">
+      <input type="text" id="apellidoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].apellido}">
       <label for="" class="text-black">Correo electronico:</label>
-      <input type="text" id="correoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${personal[0].correo}">
+      <input type="text" id="correoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].correo}">
       <label for="" class="text-black">Telefono:</label>
-      <input type="text" id="telefonoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${personal[0].telefono}">
+      <input type="text" id="telefonoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].telefono}">
       <label for="" class="text-black">Cambiar foto de perfil</label>
       <div class="flex items-center space-x-4">
         <input type="file" id="imagenInput" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-gray-300 bg-blue-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white file:text-blue-600 hover:file:bg-gray-100 transition">
@@ -199,7 +202,7 @@ async function cambiarDatosPersonales(){
 
     if(error === 0){
       const body = {
-        id: personal[0].id,
+        id: alumno[0].id,
         nombre: nombreInput.value,
         apellido: apellidoInput.value,
         correo: correoInput.value,
@@ -210,10 +213,10 @@ async function cambiarDatosPersonales(){
       if (imagenInput.files.length > 0){
 
         const formDataImagen = new FormData()
-        formDataImagen.append('id', personal[0].id)
+        formDataImagen.append('id', alumno[0].id)
         formDataImagen.append('imagen', image)
 
-        fetch('http://localhost:4000/api/personal/subir-imagen', {
+        fetch('http://localhost:4000/api/alumno/subir-imagen', {
           method: 'POST',
           headers: {
             'Authorization' : `Bearer ${token}`
@@ -256,7 +259,7 @@ async function cambiarDatosPersonales(){
   })
 }
 
-async function cargarFoto(imagen = personal[0].imagen){
+async function cargarFoto(imagen = alumno[0].imagen){
   document.getElementById('imagen-perfil').src = 'http://localhost:4000/' + imagen
 }
 

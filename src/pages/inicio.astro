@@ -1,56 +1,51 @@
 ---
 import MoodleLayout from "../layouts/Moodle-Layout.astro";
-import MaterialMoodleComponent from "../components/MateriaMoodleComponent.astro";
-
-
 ---
 
 <MoodleLayout title="Inicio">
 	<!-- Últimas calificaciones -->
     <section class="w-full bg-white p-4 rounded-2xl shadow">
       <div class="flex justify-between items-center mb-4">
-        <h2 class="text-xl font-semibold">Últimas calificaciones</h2>
-        <select class="border px-3 py-1 rounded text-sm">
-          <option>Trabajos prácticos</option>
-        </select>
+        <h2 class="text-xl font-semibold">Últimas notas de trabajos practicos</h2>
       </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left text-sm">
           <thead>
             <tr class="border-b">
               <th class="py-2">Materia</th>
-              <th class="py-2">Descripción u observación</th>
+              <th class="py-2">Archivo</th>
               <th class="py-2">Nota</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="tbodyTps">
+            
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+        <section class="w-full bg-white p-4 rounded-2xl shadow">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold">Últimas notas de examenes</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead>
             <tr class="border-b">
-              <td class="py-2">Matemáticas</td>
-              <td class="py-2">Descripción u observación</td>
-              <td class="py-2">10.10</td>
+              <th class="py-2">Materia</th>
+              <th class="py-2">Examen</th>
+              <th class="py-2">Nota</th>
             </tr>
-            <tr class="border-b">
-              <td class="py-2">Materia 2</td>
-              <td class="py-2">Descripción u observación</td>
-              <td class="py-2">10.10</td>
-            </tr>
-            <tr class="border-b">
-              <td class="py-2">Materia 3</td>
-              <td class="py-2">Descripción u observación</td>
-              <td class="py-2">10.10</td>
-            </tr>
-            <tr class="border-b">
-              <td class="py-2">Materia 4</td>
-              <td class="py-2">Descripción u observación</td>
-              <td class="py-2">10.10</td>
-            </tr>
+          </thead>
+          <tbody id="tbodyExamen">
+            
           </tbody>
         </table>
       </div>
       <div class="text-center mt-4">
-        <button class="text-gray-600 text-sm hover:underline">Ver más ⌄</button>
       </div>
     </section>
+    
 
     <!-- Carrusel -->
     <section class="w-full bg-white p-4 rounded-2xl shadow">
@@ -63,9 +58,21 @@ import MaterialMoodleComponent from "../components/MateriaMoodleComponent.astro"
 
 <script>
 //@ts-nocheck
+import { TypeFlags } from "typescript"
+let payload = {}
+//@ts-nocheck
 const token = localStorage.getItem('token')
 addEventListener('DOMContentLoaded',()=>{
+
+  const base64Url = token.split('.')[1]
+  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  }).join(''))
+  payload = JSON.parse(jsonPayload)
+
   cargarCursos()
+  cargarMateriales()
 })
 
 async function cargarCursos(){
@@ -74,6 +81,122 @@ async function cargarCursos(){
   mostrarCursos(data)
   
 }
+async function cargarMateriales(){
+    await cargarTrabajosPracticos()
+    await cargarExamen()
+}
+
+async function cargarTrabajosPracticos(){
+  const tbodyTps = document.getElementById('tbodyTps')
+  tbodyTps.innerHTML = ''
+
+  try {
+    const resAlumnoMaterial = await fetch(`http://localhost:4000/api/material/alumno/${payload.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!resAlumnoMaterial.ok) {
+      console.error("Error fetch")
+      return
+    }
+
+    const jsonAlumnoMaterial = await resAlumnoMaterial.json()
+    let data = jsonAlumnoMaterial.body
+
+    // ✅ Filtrar para solo mostrar las últimas 5
+    if (data.length > 5) {
+      data = data.slice(-5) // toma las últimas 5 (del final)
+    }
+
+    data.forEach(tps => {
+      if(tps.tipo !== 'examen'){
+        const tr = document.createElement('tr')
+        tr.classList.add('border-b')
+
+        const tdMateria = document.createElement('td')
+        tdMateria.classList.add('py-2')
+        tdMateria.textContent = tps.nombre_materia
+
+        const tdObs = document.createElement('td')
+        tdObs.classList.add('py-2')
+        tdObs.textContent = tps.observacion
+
+        const tdNota = document.createElement('td')
+        tdNota.classList.add('py-2')
+        tdNota.textContent = tps.calificacion
+
+        tr.appendChild(tdMateria)
+        tr.appendChild(tdObs)
+        tr.appendChild(tdNota)
+        tbodyTps.appendChild(tr)
+      }
+      
+    })
+
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+async function cargarExamen(){
+  const tbodyTps = document.getElementById('tbodyExamen')
+  tbodyTps.innerHTML = '' 
+
+  try {
+    const resAlumnoExamen = await fetch(`http://localhost:4000/api/material/alumno/${payload.id}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      }
+    })
+
+    if (!resAlumnoExamen.ok) {
+      console.error("Error fetch")
+      return
+    }
+
+    const jsonAlumnoExamen = await resAlumnoExamen.json()
+    let data = jsonAlumnoExamen.body
+
+    // ✅ Filtrar para solo mostrar las últimas 5
+    if (data.length > 5) {
+      data = data.slice(-5) // toma las últimas 5 (del final)
+    }
+
+    data.forEach(examen => {
+      if(examen.tipo === 'examen'){
+        const tr = document.createElement('tr')
+        tr.classList.add('border-b')
+
+        const tdMateria = document.createElement('td')
+        tdMateria.classList.add('py-2')
+        tdMateria.textContent = examen.nombre_materia
+
+        const tdObs = document.createElement('td')
+        tdObs.classList.add('py-2')
+        tdObs.textContent = examen.observacion
+
+        const tdNota = document.createElement('td')
+        tdNota.classList.add('py-2')
+        tdNota.textContent = examen.calificacion
+
+        tr.appendChild(tdMateria)
+        tr.appendChild(tdObs)
+        tr.appendChild(tdNota)
+        tbodyTps.appendChild(tr)
+      }
+    })
+
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 
 function mostrarCursos(data){
   const contenedor = document.getElementById('contenedor-cursos')
@@ -91,13 +214,6 @@ function mostrarCursos(data){
 }
 
 async function obtenerCursos(data){
-  const base64Url = token.split('.')[1]
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-  const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
-    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
-  }).join(''))
-  const payload = JSON.parse(jsonPayload)
-
 
   if(payload.ocupacion === 'alumno'){
     const resCursosAlumno = await fetch(`http://localhost:4000/api/curso/alumno/${payload.id}/cursos`,{

@@ -337,7 +337,7 @@ async function mostrarModalCargarArchivo(elemento) {
         <p id="archivoEstado"><strong>Estado:</strong> ${entregado? mostrarInformacion.estado : 'no enviado'}</p>
         <p id="archivoNota"><strong>Nota:</strong>${entregado? mostrarInformacion.nota : '----'}</p>
         <div class="flex justify-end gap-2">
-          <button id="guardarArchivoEntrega" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Enviar Entrega</button>
+          <button id="guardarArchivoEntrega" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 ${entregado? 'hidden': ''}">Enviar Entrega</button>
           <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
         </div>
       </div>

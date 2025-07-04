@@ -36,13 +36,15 @@ import '../css/style.css';
 								</a>
 							</li>
 							<li class="flex items-center">
-							<div id="dropdownButton" class="py-1 px-2 flex relative rounded-full text-white ml-10 bg-gray-800 hover:bg-gray-700 transition">
+							<div id="dropdownButton" class="py-1 px-2 flex relative rounded-full text-white ml-10 bg-slate-900 hover:bg-slate-700 transition">
 								<button id="buttonText" class="ml-2 mr-3">Juan riquelme</button>
-								<div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-sm border-2 left-0 z-10 text-black">
-									<a href="">Perfil</a>
-									<a href="">cerrar sesión</a>
+								<div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-xl border-2 left-0 top-12 z-10 text-black">
+									<a href="/perfil-alumno" class="hover:rounded-t-lg">Perfil</a>
+									<a href="/" id="cerrarSesion" class="hover:rounded-b-lg">cerrar sesión</a>
 								</div>
-								<img src="../../public/img/usuario-de-perfil.png" alt="" class="w-10">
+								<div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
+									<img id="perfil-menu" src="../../public/img/usuario-de-perfil.png" alt="" class="object-cover w-full h-full">
+								</div>
 							</div>
 							</li>
 						</ul>
@@ -65,58 +67,101 @@ import '../css/style.css';
 <script>
 	//@ts-nocheck
 	import { jwtDecode } from 'jwt-decode'
+	let token = {}
+	let payload = {}
+	function obtenerPayload(){
+		interface Payload {
+			tipo: string
+			correo: string
+			nombre: string
+			apellido: string
+			id: number
+			iat: number
+			exp: number
+			rol?: string
+		}
 
-	interface Payload {
-		tipo: string
-		correo: string
-		nombre: string
-		apellido: string
-		id: number
-		iat: number
-		exp: number
-		rol?: string
+		if (typeof window !== 'undefined') {
+			token = localStorage.getItem('token')
+
+			if (!token) {
+			window.location.href = '/error'
+			} else {
+				try {
+					payload = jwtDecode<Payload>(token)
+
+					if (!['profesor', 'administrador', 'alumno'].includes(payload.ocupacion.toLowerCase())) {
+						window.location.href = '/error'
+					}
+					if(payload.ocupacion === 'profesor' ){
+						document.getElementById('dashboard')?.classList.remove('hidden')
+					}
+					return [token,payload]
+				} catch (e) {
+					window.location.href = '/'
+				}
+			}
+		}
 	}
 
-	if (typeof window !== 'undefined') {
-		const token = localStorage.getItem('token')
+	addEventListener('DOMContentLoaded',()=>{
+		[token,payload] = obtenerPayload()
+		cargarDatos()
+	})
 
-		if (!token) {
-		window.location.href = '/error'
-		} else {
+	async function cargarDatos(){
+		await cambiarFoto()
+	}
+
+	async function cambiarFoto(){
 		try {
-			const payload = jwtDecode<Payload>(token)
-
-			if (!['profesor', 'administrador', 'alumno'].includes(payload.ocupacion.toLowerCase())) {
-				window.location.href = '/error'
+			const res = await fetch(`http://localhost:4000/api/alumno/${payload.id}`, {
+			method: 'GET',
+			headers: {
+				'Content-Type': 'application/json',
+				'Authorization': `Bearer ${token}`
 			}
-			if(payload.ocupacion === 'profesor' ){
-				document.getElementById('dashboard')?.classList.remove('hidden')
+			})
+
+			const data = await res.json()
+
+			if (!res.ok) {
+			console.error('Error al obtener alumno:', data)
+			return null
 			}
 
-
-		} catch (e) {
-			window.location.href = '/'
+			document.getElementById('perfil-menu').src = 'http://localhost:4000/' + data.body[0].imagen
+		} catch (error) {
+			console.error('Error de red:', error)
+			return null
 		}
-		}
-
-		
 	}
-
 	
 
 
 	//MENU DESPLEGABLE
-    const  drop = document.querySelector("#dropdownButton")
-    const dropmenu = document.querySelector("#dropdownContent")
-    drop?.addEventListener("click",()=>{
-        if(dropmenu?.classList.contains("hidden")){
-            dropmenu?.classList.remove("hidden")
-        }
-        else
-		{
+	const  drop = document.querySelector("#dropdownButton")
+	const dropmenu = document.querySelector("#dropdownContent")
+	drop?.addEventListener("click",()=>{
+		if(dropmenu?.classList.contains("hidden")){
+			dropmenu?.classList.remove("hidden")
+		}
+		else{
 			dropmenu?.classList.add("hidden")
 		}
-        })
+		})
+
+		document.addEventListener("click", (e) => {
+		// Si el menú está abierto y el click no fue dentro del menú ni del botón
+		if (!dropmenu?.classList.contains("hidden") && !dropmenu.contains(e.target) && !drop.contains(e.target)) {
+			dropmenu.classList.add("hidden")
+		}
+	})
+
+document.getElementById('cerrarSesion').addEventListener('click',()=>{
+	localStorage.removeItem('token')
+	window.location.href = '/'
+})
 </script>
 
 <style>
