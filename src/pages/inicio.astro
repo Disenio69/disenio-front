@@ -4,7 +4,7 @@ import MoodleLayout from "../layouts/Moodle-Layout.astro";
 
 <MoodleLayout title="Inicio">
 	<!-- Últimas calificaciones -->
-    <section class="w-full bg-white p-4 rounded-2xl shadow">
+    <section id="pracSection" class="w-full bg-white p-4 rounded-2xl shadow">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Últimas notas de trabajos practicos</h2>
       </div>
@@ -24,7 +24,7 @@ import MoodleLayout from "../layouts/Moodle-Layout.astro";
       </div>
     </section>
 
-        <section class="w-full bg-white p-4 rounded-2xl shadow">
+      <section id="examSection" class="w-full bg-white p-4 rounded-2xl shadow">
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-xl font-semibold">Últimas notas de examenes</h2>
       </div>
@@ -70,6 +70,11 @@ addEventListener('DOMContentLoaded',()=>{
     return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
   }).join(''))
   payload = JSON.parse(jsonPayload)
+
+  const disPrac = document.getElementById('pracSection')
+  disPrac.classList.add('hidden')
+  const disExam = document.getElementById('examSection')
+  disExam.classList.add('hidden')
 
   cargarCursos()
   cargarMateriales()

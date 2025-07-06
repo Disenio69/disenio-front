@@ -3,13 +3,20 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 import DropdownButton from '../components/dropdownButton.astro';
 ---
 
-<DashboardLayout title='Gestión de examenes ' path='Gestión de examenes' pageTitle='Gestión de examenes'>
-  <select class="appearance-none w-[200px] leading-tight focus:outline-none rounded-3xl bg-blue-700 px-8 py-1.5 text-white text-sm ml-10 mr-0" id="select-curso" name="curso">
-    <option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>
-  </select>
-  <button id="cargarExamen" class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0">Cargar examén</button>
-  <div class="mt-4">
-    <span class="float-right mr-14">
+<DashboardLayout title='Cargar examenes al sistema' path='Cargar examenes al sistema' pageTitle='Cargar examenes al sistema'>
+  <div class="flex items-center">
+    <div class="relative w-[320px] ml-10">
+      <select id="select-curso" class="appearance-none w-full leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg">
+        <option value="" disabled selected>Seleccionar curso</option>
+      </select>
+      <i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-gray-700"></i>
+    </div>
+    <button id="cargarExamen" class="w-[320px] rounded-3xl bg-blue-700 px-10 py-1 text-white text-lg ml-10 mr-0 shadow-lg">
+      Cargar examén
+    </button>
+  </div>
+  <div class="">
+    <span class="float-right mr-14 mb-2">
       <span class="text-sm text-gray-700">Descargar como:</span>
       <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
     </span>
@@ -106,7 +113,6 @@ try {
           ${examen.calificacion}
         </td>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-          <button class="mr-2 rounded-3xl bg-sky-400 w-6 h-6"><i class="fa-solid fa-pen-to-square" style="color: #000000;"></i></button>
           <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
         </td>
       `
@@ -169,7 +175,7 @@ async function cargarDatos() {
             
       }})
 
-      document.getElementById('cargarExamen')?.addEventListener('click',async()=>{
+      document.getElementById('cargarExamen').addEventListener('click',async()=>{
         const modal = document.createElement('DIV')
         modal.innerHTML = `
             <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

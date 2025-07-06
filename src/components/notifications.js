@@ -25,7 +25,7 @@ export class Notification{
             notificationNode.classList.add("bg-yellow-600")
         }
 
-        this.targetNot.parentElement.appendChild(notificationNode)
+         this.targetNot.insertAdjacentElement('afterend', notificationNode)
 
     }
 

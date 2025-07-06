@@ -1,0 +1,371 @@
+---
+import DashboardLayout from '../layouts/Dashboard-Layout.astro';
+---
+
+<DashboardLayout title='Gestión de aulas y horarios' path='Gestión de aulas y horarios' pageTitle='Gestión de aulas y horarios'>
+      <button class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" id="agregar-aula">Agregar aula</button>
+      <button class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" id="agregar-horario">Agregar horario de un curso</button>
+      <span class="float-right mr-14">
+        <span class="text-sm text-gray-700">Descargar como:</span>
+        <i class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+      </span>
+            <!------------------------TABLE-------------------- -->
+            <!------------------------TABLE-------------------- -->
+          <div class="mb-10 mt-5">
+            <div class="xl:w-full px-10">
+              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
+                <div class="rounded-t mb-0 px-4 py-3 border-0">
+                  <div class="flex flex-wrap items-center">
+                    <div class="relative w-full px-2 flex-grow flex-1">
+                      <h3 class="font-semibold text-base text-blueGray-700">Horarios agregados recientemente</h3>
+                    </div>
+                    <div class="relative flex-grow flex-1 sm:text-right">
+                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
+                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+                    </div>
+                  </div>
+                </div>
+            
+                <div class="block w-full overflow-x-auto">
+                  <table class="items-center bg-transparent w-full border-collapse ">
+                    <thead>
+                      <tr>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Curso</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Aula</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Dia</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Hora de inicio</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Hora de fin</th>
+                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
+                      </tr>
+                    </thead>
+            
+                    <tbody id="tbody">
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+          </div>
+</DashboardLayout>
+
+<script>
+//@ts-nocheck
+import * as validation from "../components/validations.ts"
+import { Notification } from "../components/notifications.js"
+const token = localStorage.getItem('token')
+
+document.addEventListener('DOMContentLoaded',()=>{
+  cargarTabla()
+})
+
+async function cargarTabla(){
+  try {
+    const resInfoCompleta = await fetch('http://localhost:4000/api/aula/info-completa', {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        'Authorization': `Bearer ${token}`
+      }
+      })
+    
+      if(!resInfoCompleta){
+        console.error('error',resAgregarAula)
+      }
+      const jsonInfoCompleta = await resInfoCompleta.json()
+      const infoCompleta = jsonInfoCompleta.body
+
+      const tbody = document.getElementById('tbody')
+      tbody.innerHTML = ''
+      infoCompleta.forEach(info => {
+        const tr = document.createElement('tr')
+
+        const thMateria = document.createElement('td')
+        thMateria.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs'
+        thMateria.textContent = info.curso_nombre
+
+        const tdAula = document.createElement('td')
+        tdAula.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
+        tdAula.textContent = info.aula_nombre
+
+        const tdDia = document.createElement('td')
+        tdDia.className = 'border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
+        tdDia.textContent = info.dia
+
+        const tdHorarioInicio = document.createElement('td')
+        tdHorarioInicio.className = 'border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
+        tdHorarioInicio.textContent = `${info.hora_inicio}`
+
+        const tdHorarioFin = document.createElement('td')
+        tdHorarioFin.className = 'border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
+        tdHorarioFin.textContent = `${info.hora_fin}`
+
+        const tdOpciones = document.createElement('td')
+        tdOpciones.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4'
+
+        const btn = document.createElement('button')
+        btn.className = 'rounded-3xl bg-red-600 w-6 h-6 eliminarCurso'
+        btn.setAttribute('data-id', info.curso_id)
+        btn.innerHTML = '<i class="fa-solid fa-xmark" style="color: #000000;"></i>'
+
+        btn.addEventListener('click', () => {
+          ModalConfirmarEliminacion(async () => {
+            try {
+              const id = btn.getAttribute('data-id')
+
+              const res = await fetch('http://localhost:4000/api/aula/eliminar-curso-asignacion', {
+                method: 'PUT',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ id })
+              })
+
+              if (!res.ok) {
+                ModalConfirmacion(false)
+                throw new Error('Error al eliminar la asignación')
+              }
+
+              ModalConfirmacion(true)
+              cargarTabla()
+            } catch (error) {
+              console.error(error)
+            }
+          })
+        })
+
+
+
+        tdOpciones.appendChild(btn)
+        tr.appendChild(thMateria)
+        tr.appendChild(tdAula)
+        tr.appendChild(tdDia)
+        tr.appendChild(tdHorarioInicio)
+        tr.appendChild(tdHorarioFin)
+        tr.appendChild(tdOpciones)
+        tbody.appendChild(tr)
+
+      })
+        
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+document.getElementById('agregar-aula').addEventListener('click',()=>{
+  const modal = document.createElement('DIV')
+  modal.innerHTML = `
+      <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+          <h2 class="text-xl font-semibold text-gray-800">Agregar nuevo aula</h2>
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Nombre del aula</label>
+          <input class="  appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="nombreAula" type="text">
+          <div class="flex justify-end gap-2">
+            <button id="agregarAula" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500">Agregar aula</button>
+            <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
+          </div>
+        </div>
+      </div>`
+  document.body.appendChild(modal)
+  document.getElementById('cancelarModal').addEventListener('click',()=>modal.remove())
+  document.getElementById('agregarAula').addEventListener('click',async ()=>{
+    const nombreAula = document.getElementById('nombreAula')
+    let error = 0
+    error = validation.checkInputAlphaNumeric(nombreAula, 4, 50)
+    if(error === 0){
+      try {
+        const resAgregarAula = await fetch('http://localhost:4000/api/aula', {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            nombre : nombreAula.value
+          })
+          })
+        
+          if(!resAgregarAula){
+            console.error('error',resAgregarAula)
+          }
+
+          modal.remove()
+          ModalConfirmacion(true)
+            
+      } catch (error) {
+        console.error(error)
+        modal.remove()
+          ModalConfirmacion(false)
+      }
+    }
+  })
+})
+document.getElementById('agregar-horario').addEventListener('click', async () => {
+
+  // Traer aulas
+  const resAulas = await fetch('http://localhost:4000/api/aula/', {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  const dataAulas = await resAulas.json()
+
+  // Traer cursos
+  const resCursos = await fetch('http://localhost:4000/api/curso', {
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    }
+  })
+  const dataCursos = await resCursos.json()
+
+  // Crear modal
+  const modal = document.createElement('DIV')
+  modal.innerHTML = `
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+        <h2 class="text-xl font-semibold text-gray-800">Agregar nuevo horario</h2>
+
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Aula</label>
+        <select id="aulaSelect" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none"></select>
+
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Curso</label>
+        <select id="cursoSelect" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none"></select>
+
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Día</label>
+        <select id="dia" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">
+          <option value="" disabled selected>-- Seleccionar día --</option>
+          <option value="Lunes">Lunes</option>
+          <option value="Martes">Martes</option>
+          <option value="Miércoles">Miércoles</option>
+          <option value="Jueves">Jueves</option>
+        </select>
+
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Hora inicio</label>
+        <input id="horarioInicio" type="time" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">
+
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Hora fin</label>
+        <input id="horarioFin" type="time" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">
+
+        <div class="flex justify-end gap-2">
+          <button id="guardarHorario" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500">Agregar horario</button>
+          <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
+        </div>
+      </div>
+    </div>`
+
+  document.body.appendChild(modal)
+
+  // Llenar select de aulas
+  const aulaSelect = modal.querySelector('#aulaSelect')
+  const optionAulaDefault = document.createElement('option')
+  optionAulaDefault.value = ''
+  optionAulaDefault.textContent = '-- Seleccionar aula --'
+  optionAulaDefault.disabled = true
+  optionAulaDefault.selected = true
+  aulaSelect.appendChild(optionAulaDefault)
+
+  dataAulas.body.forEach(aula => {
+    const option = document.createElement('option')
+    option.value = aula.id
+    option.textContent = aula.nombre
+    aulaSelect.appendChild(option)
+  })
+
+  // Llenar select de cursos
+  const cursoSelect = modal.querySelector('#cursoSelect')
+  const optionCursoDefault = document.createElement('option')
+  optionCursoDefault.value = ''
+  optionCursoDefault.textContent = '-- Seleccionar curso --'
+  optionCursoDefault.disabled = true
+  optionCursoDefault.selected = true
+  cursoSelect.appendChild(optionCursoDefault)
+
+  dataCursos.body.forEach(curso => {
+    const option = document.createElement('option')
+    option.value = curso.id
+    option.textContent = curso.nombre
+    cursoSelect.appendChild(option)
+  })
+
+  // Botón cancelar
+  document.getElementById('cancelarModal').addEventListener('click', () => modal.remove())
+
+  // Botón guardar
+  document.getElementById('guardarHorario').addEventListener('click', async () => {
+    const idAula = aulaSelect.value
+    const idCurso = cursoSelect.value
+    const dia = document.getElementById('dia').value
+    const horaInicio = document.getElementById('horarioInicio').value
+    const horaFin = document.getElementById('horarioFin').value
+
+    try {
+      const res = await fetch('http://localhost:4000/api/aula/asignar-curso-aula-horario', {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          idCurso,
+          idAula,
+          dia,
+          hora_inicio: horaInicio,
+          hora_fin: horaFin
+        })
+      })
+
+      if (!res.ok) {
+        throw new Error('Error al asignar horario')
+      }
+
+      modal.remove()
+      cargarTabla()
+      ModalConfirmacion(true)
+    } catch (error) {
+      modal.remove()
+      ModalConfirmacion(false)
+      console.error(error)
+    }
+  })
+})
+
+
+function ModalConfirmacion(estado){
+  const modalConfirmacion = document.createElement('DIV')
+  modalConfirmacion.innerHTML = `
+    <div id="modal-confirmacion" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg flex flex-col items-center space-y-4 relative">
+        <h2 class="text-lg font-semibold text-gray-800 text-center">${estado? 'Guardado con éxito': 'Error al guardar'}</h2>
+        <button id="cerrar" class="px-4 py-2 ${estado? 'bg-green-700 hover:bg-green-600': 'bg-red-700 hover:bg-red-600'} text-white rounded">Aceptar</button>
+      </div>
+    </div>`
+  document.body.appendChild(modalConfirmacion)
+  document.getElementById('cerrar').addEventListener('click', () => modalConfirmacion.remove())
+}
+
+function ModalConfirmarEliminacion(onConfirm) {
+  const modal = document.createElement('DIV')
+  modal.innerHTML = `
+    <div id="modal-confirmar" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg flex flex-col items-center space-y-4 relative">
+        <h2 class="text-lg font-semibold text-gray-800 text-center">¿Estás seguro de eliminar esta asignación?</h2>
+        <div class="flex gap-4">
+          <button id="confirmarEliminar" class="px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded">Eliminar</button>
+          <button id="cancelarEliminar" class="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded">Cancelar</button>
+        </div>
+      </div>
+    </div>`
+  document.body.appendChild(modal)
+
+  document.getElementById('confirmarEliminar').addEventListener('click', () => {
+    modal.remove()
+    onConfirm()
+  })
+
+  document.getElementById('cancelarEliminar').addEventListener('click', () => {
+    modal.remove()
+  })
+}
+
+</script>

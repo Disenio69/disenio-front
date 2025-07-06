@@ -82,11 +82,18 @@
 
         localStorage.setItem('token', token)
 
-        // ✅ Ahora correcto
-        if (usuario.ocupacion && usuario.ocupacion.toLowerCase() === 'profesor') {
-          window.location.href = '/inicio-dashboard'
-        } else {
-          window.location.href = '/inicio'
+        if(usuario.ocupacion){
+          if (usuario.ocupacion.toLowerCase() === 'profesor' || usuario.ocupacion.toLowerCase() === 'administrador') {
+            window.location.href = '/inicio-dashboard'
+          } else {
+            if(usuario.ocupacion.toLowerCase() === 'alumno'){
+              window.location.href = '/inicio'
+            }
+            else{
+              window.location.href = '/error'
+            }
+            
+          }
         }
       } catch (err) {
         if (err instanceof Error) {

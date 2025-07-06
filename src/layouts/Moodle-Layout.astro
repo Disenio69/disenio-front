@@ -23,27 +23,27 @@ import '../css/style.css';
 		<div class="w-full max-w-7xl">
 			<nav class="bg-white border-b shadow-sm flex flex-wrap items-center justify-between" navbar-main navbar-scroll="false">   
 				<div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
+					<a href="/inicio" class="flex items-center">
 					<div>
 						<img src="../../public/img/school-icon.png" alt="school icon" class="w-10 ml-5">
 					</div>
 					<span class="ml-5 font-bold">Aula virtual EFP N°31</span>
+					</a>
 					<!--left options -->
 					<div class="flex items-center mt-2 grow sm:mt-0 sm:mr-6 md:mr-0 lg:flex lg:basis-auto">
 						<ul class="md:ml-auto md:pr-4 flex flex-row justify-end pl-0 mb-0 list-none md-max:w-full">
 							<li id="dashboard" class="flex items-center hidden">
-								<a href="/inicio-dashboard" class="flex relative text-black ml-10 underline hover:text-blue-700">
-									Dashboard
-								</a>
 							</li>
 							<li class="flex items-center">
 							<div id="dropdownButton" class="py-1 px-2 flex relative rounded-full text-white ml-10 bg-slate-900 hover:bg-slate-700 transition">
-								<button id="buttonText" class="ml-2 mr-3">Juan riquelme</button>
-								<div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-xl border-2 left-0 top-12 z-10 text-black">
-									<a href="/perfil-alumno" class="hover:rounded-t-lg">Perfil</a>
+								<button id="username" class="ml-2 mr-3"></button>
+								<div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-xl border-2 left-0 top-14 z-10 text-black">
+									<a href="/perfil-alumno" id="ir-al-perfil" class="hover:rounded-t-lg">Perfil</a>
+									<a href="/inicio-dashboard" class="hover:rounded-lg">ir al Dashboard</a>
 									<a href="/" id="cerrarSesion" class="hover:rounded-b-lg">cerrar sesión</a>
 								</div>
 								<div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
-									<img id="perfil-menu" src="../../public/img/usuario-de-perfil.png" alt="" class="object-cover w-full h-full">
+									<img id="perfil-menu" src="../../public/img/avatar-femenino.png" alt="" class="object-cover w-full h-full">
 								</div>
 							</div>
 							</li>
@@ -93,8 +93,11 @@ import '../css/style.css';
 					if (!['profesor', 'administrador', 'alumno'].includes(payload.ocupacion.toLowerCase())) {
 						window.location.href = '/error'
 					}
-					if(payload.ocupacion === 'profesor' ){
+					if(['profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())){
 						document.getElementById('dashboard')?.classList.remove('hidden')
+						const perfil = document.getElementById('ir-al-perfil')
+						console.log(perfil)
+						perfil.href ='/perfil'
 					}
 					return [token,payload]
 				} catch (e) {
@@ -111,30 +114,110 @@ import '../css/style.css';
 
 	async function cargarDatos(){
 		await cambiarFoto()
+		if (['profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())){
+			try {
+				const res = await fetch(`http://localhost:4000/api/personal/${payload.id}`, {
+					method: 'GET',
+					headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const data = await res.json()
+
+				if (!res.ok) {
+					console.error('Error al obtener datos del profesor:', data)
+					return null
+				}
+					const username = document.getElementById('username')
+					username.textContent = `${data.body[0].nombre} ${data.body[0].apellido}`
+				
+			} catch (error) {
+				console.error('Error de red:', error)
+				return null
+			}
+		}
+		else{
+			try {
+				const res = await fetch(`http://localhost:4000/api/alumno/${payload.id}`, {
+					method: 'GET',
+					headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const data = await res.json()
+
+				if (!res.ok) {
+					console.error('Error al obtener datos del profesor:', data)
+					return null
+				}
+					const username = document.getElementById('username')
+					username.textContent = `${data.body[0].nombre} ${data.body[0].apellido}`
+				
+			} catch (error) {
+				console.error('Error de red:', error)
+				return null
+			}
+		}
+		
 	}
 
 	async function cambiarFoto(){
-		try {
-			const res = await fetch(`http://localhost:4000/api/alumno/${payload.id}`, {
-			method: 'GET',
-			headers: {
-				'Content-Type': 'application/json',
-				'Authorization': `Bearer ${token}`
+		if(['profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())){
+			try {
+				const res = await fetch(`http://localhost:4000/api/personal/${payload.id}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+				})
+
+				const data = await res.json()
+
+				if (!res.ok) {
+				console.error('Error al obtener la imagne de perfil', data)
+				return null
+				}
+
+				if(data.body[0].imagen !== null){
+					document.getElementById('perfil-menu').src = 'http://localhost:4000/' + data.body[0].imagen
+				}
+
+			} catch (error) {
+				console.error('Error de red:', error)
+				return null
 			}
-			})
+		}else{
+			try {
+				const res = await fetch(`http://localhost:4000/api/alumno/${payload.id}`, {
+				method: 'GET',
+				headers: {
+					'Content-Type': 'application/json',
+					'Authorization': `Bearer ${token}`
+				}
+				})
 
-			const data = await res.json()
+				const data = await res.json()
 
-			if (!res.ok) {
-			console.error('Error al obtener alumno:', data)
-			return null
+				if (!res.ok) {
+				console.error('Error al obtener alumno:', data)
+				return null
+				}
+
+				if(data.body[0].imagen !== null){
+					document.getElementById('perfil-menu').src = 'http://localhost:4000/' + data.body[0].imagen
+				}
+
+			} catch (error) {
+				console.error('Error de red:', error)
+				return null
 			}
-
-			document.getElementById('perfil-menu').src = 'http://localhost:4000/' + data.body[0].imagen
-		} catch (error) {
-			console.error('Error de red:', error)
-			return null
 		}
+		
 	}
 	
 
