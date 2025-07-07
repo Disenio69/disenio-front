@@ -120,15 +120,15 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             <button id="form-submit" class="bg-gray-500 text-white font-bold py-2 px-4 rounded " type="submit">
               Agregar usuario
             </button>
-            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/gestion-de-usuarios">
-                Cancelar
+            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/gestionar-usuarios">
+                Cerrar
               </a>
           </div>
       </form>
 </DashboardLayout>
 
 <script>
-  //@ts-check
+  //@ts-nocheck
   import {Notification} from "../components/notifications.js"
   import * as validation from "../components/validations.ts"
   import { showModal } from '../components/modal.js'
@@ -261,7 +261,6 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             const data = await response.json()
 
             if (!response.ok) {
-              // 🔥 Ahora el mensaje del backend está en data.message
               const mensaje = data.body || data.message || 'Error desconocido'
               showModal("Error: " + mensaje, 'Error')
               throw new Error(mensaje)

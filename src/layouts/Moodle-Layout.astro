@@ -25,7 +25,7 @@ import '../css/style.css';
 				<div class="flex items-center justify-between w-full px-4 py-1 mx-auto flex-wrap-inherit">
 					<a href="/inicio" class="flex items-center">
 					<div>
-						<img src="../../public/img/school-icon.png" alt="school icon" class="w-10 ml-5">
+						<img src="../../public/img/icono-escuela.png" alt="" class="w-[65px] ml-5">
 					</div>
 					<span class="ml-5 font-bold">Aula virtual EFP N°31</span>
 					</a>
@@ -39,7 +39,7 @@ import '../css/style.css';
 								<button id="username" class="ml-2 mr-3"></button>
 								<div id="dropdownContent" class="dropdown-content hidden absolute bg-white w-full shadow-lg rounded-xl border-2 left-0 top-14 z-10 text-black">
 									<a href="/perfil-alumno" id="ir-al-perfil" class="hover:rounded-t-lg">Perfil</a>
-									<a href="/inicio-dashboard" class="hover:rounded-lg">ir al Dashboard</a>
+									<a href="/inicio-dashboard" id="ir-al-dash" class="hover:rounded-lg hidden">ir al Dashboard</a>
 									<a href="/" id="cerrarSesion" class="hover:rounded-b-lg">cerrar sesión</a>
 								</div>
 								<div class="w-12 h-12 rounded-full overflow-hidden flex items-center justify-center bg-gray-200">
@@ -90,15 +90,22 @@ import '../css/style.css';
 				try {
 					payload = jwtDecode<Payload>(token)
 
-					if (!['profesor', 'administrador', 'alumno'].includes(payload.ocupacion.toLowerCase())) {
+					if (!payload.ocupacion || !['profesor', 'administrador', 'alumno'].includes(payload.ocupacion.toLowerCase())) {
 						window.location.href = '/error'
 					}
-					if(['profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())){
+					const irDash = document.getElementById('ir-al-dash')
+					const perfil = document.getElementById('ir-al-perfil')
+
+					if (payload.ocupacion && ['profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())) {
 						document.getElementById('dashboard')?.classList.remove('hidden')
-						const perfil = document.getElementById('ir-al-perfil')
-						console.log(perfil)
-						perfil.href ='/perfil'
+						perfil.href = '/perfil'
+						irDash.classList.remove('hidden')
+					} else {
+						// Si no es profesor ni admin, eliminar el enlace del DOM directamente
+						irDash.remove()
 					}
+
+
 					return [token,payload]
 				} catch (e) {
 					window.location.href = '/'

@@ -102,7 +102,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
             <button id="form-submit" class="bg-gray-500 text-white font-bold py-2 px-4 rounded " type="submit">
               Agregar usuario
             </button>
-            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/gestion-de-usuarios">
+            <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/gestionar-usuarios">
                 Cancelar
               </a>
           </div>
@@ -251,7 +251,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         alert(isStudent ? "Alumno actualizado" : "Personal actualizado");
         form.reset();
-        window.location.href = "/gestion-de-usuarios";
+        window.location.href = "/gestionar-usuarios";
       } catch (error) {
         alert("Error: " + (error instanceof Error ? error.message : String(error)));
       }

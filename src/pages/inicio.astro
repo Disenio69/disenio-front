@@ -71,10 +71,13 @@ addEventListener('DOMContentLoaded',()=>{
   }).join(''))
   payload = JSON.parse(jsonPayload)
 
-  const disPrac = document.getElementById('pracSection')
-  disPrac.classList.add('hidden')
-  const disExam = document.getElementById('examSection')
-  disExam.classList.add('hidden')
+  if(['profesor', 'administrador'].includes(payload.ocupacion.toLowerCase())){
+    const disPrac = document.getElementById('pracSection')
+    disPrac.classList.add('hidden')
+    const disExam = document.getElementById('examSection')
+    disExam.classList.add('hidden')
+  }
+
 
   cargarCursos()
   cargarMateriales()

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Error</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  </head>
+  <body class="bg-gradient-to-br from-blue-100 via-sky-100 to-white min-h-screen flex items-center justify-center">
+
+    <div class="bg-white p-10 rounded-3xl shadow-2xl flex flex-col items-center text-center max-w-md w-full animate-fade-in">
+      <div class="text-6xl mb-4">😵‍💫</div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">¡Uy! Ocurrió un error</h1>
+      <p class="text-gray-600 mb-6">Podés regresar al inicio o tu panel.</p>
+      <button id="btn-volver" class="bg-blue-700 text-white px-6 py-3 rounded-full shadow hover:bg-blue-800 transition">Volver</button>
+    </div>
+
+    <style>
+      @keyframes fade-in {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fade-in 0.5s ease-out;
+      }
+    </style>
+
+    <script type="module">
+      import { jwtDecode } from "https://cdn.jsdelivr.net/npm/jwt-decode@4.0.0/+esm"
+
+      document.getElementById('btn-volver').addEventListener('click', () => {
+        try {
+          const token = localStorage.getItem('token')
+          if (!token) {
+            window.location.href = '/'
+            return
+          }
+
+          const payload = jwtDecode(token)
+
+          if (!payload.ocupacion) {
+            window.location.href = '/'
+            return
+          }
+
+          const ocupacion = payload.ocupacion.toLowerCase()
+
+          if (ocupacion === 'alumno') {
+            window.location.href = '/inicio'
+          } else if (ocupacion === 'profesor' || ocupacion === 'administrador') {
+            window.location.href = '/inicio-dashboard'
+          } else {
+            window.location.href = '/'
+          }
+        } catch (error) {
+          console.error('Error al decodificar token:', error)
+          window.location.href = '/'
+        }
+      })
+    </script>
+  </body>
+</html>

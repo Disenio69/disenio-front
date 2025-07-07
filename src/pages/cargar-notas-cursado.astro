@@ -4,8 +4,7 @@ import DropdownButton from '../components/dropdownButton.astro';
 ---
 
 <DashboardLayout title='Gestión de examenes y materias' path='Examenes y materias' pageTitle='Gestión de examenes y materias'>
-    <div class="flex items-center space-x-4">
-
+  <div class="flex items-center space-x-4">
     <div class="relative w-[320px] ml-10">
       <select class="appearance-none w-full leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg" id="select-curso" name="curso">
         <option value="" disabled selected>Seleccionar curso</option>
@@ -14,8 +13,6 @@ import DropdownButton from '../components/dropdownButton.astro';
     </div>
   </div>
 
-
-  
   <div class="mt-5">
     <span class="float-right mr-14 mb-2">
       <span class="text-sm text-gray-700">Descargar como:</span>
@@ -23,50 +20,65 @@ import DropdownButton from '../components/dropdownButton.astro';
     </span>
   </div>
 
-            <!------------------------TABLE-------------------- -->
-            <!------------------------TABLE-------------------- -->
-          <div class="mb-10 mt-5">
-            <div class="xl:w-full px-10">
-              <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
-                <div class="rounded-t mb-0 px-4 py-3 border-0">
-                  <div class="flex flex-wrap items-center">
-                    <div class="relative w-full px-2 flex-grow flex-1">
-                      <h3 class="font-semibold text-base text-blueGray-700">Notas del curso</h3>
-                    </div>
-                    <div class="relative flex-grow flex-1 sm:text-right">
-                      <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
-                      <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
-                    </div>
-                  </div>
-                </div>
-            
-                <div class="block w-full overflow-x-auto">
-                  <table class="items-center bg-transparent w-full border-collapse ">
-                    <thead>
-                      <tr>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">DNI</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Nota final</th>
-                        <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left">Opciones</th>
-                      </tr>
-                    </thead>
-            
-                    <tbody id="tbody">
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+  <div class="mb-10 mt-5">
+    <div class="xl:w-full px-10">
+      <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded">
+        <div class="rounded-t mb-0 px-4 py-3 border-0">
+          <div class="flex flex-wrap items-center">
+            <div class="relative w-full px-2 flex-grow flex-1">
+              <h3 class="font-semibold text-base text-blueGray-700">Notas del curso</h3>
+            </div>
+            <div class="relative flex-grow flex-1 sm:text-right">
+              <input id="search-by-dni" class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
+              <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
+            </div>
           </div>
+        </div>
+
+        <div class="block w-full overflow-x-auto">
+          <table class="items-center bg-transparent w-full border-collapse ">
+            <thead>
+              <tr>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">DNI</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Nombre y apellido</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Nota final</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Opciones</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- PAGINATION -->
+      <div class="flex flex-col items-center mt-4">
+        <span class="text-sm text-gray-700">Mostrando <span id="paginationStart"></span> a <span id="paginationEnd"></span> de <span id="totalPagination"></span> entradas</span>
+        <div class="inline-flex mt-2">
+          <button id="previousPage" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900 disabled:opacity-50" disabled>Anterior</button>
+          <button id="nextPage" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-s hover:bg-gray-900 disabled:opacity-50" disabled>Siguiente</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </DashboardLayout>
+
 <script>
   //@ts-nocheck
-  import { jwtDecode } from 'jwt-decode'
-  import {Notification} from '../components/notifications'
+  import { Notification } from '../components/notifications'
   const token = localStorage.getItem('token')
   let cursos = []
   let payload = {}
   let cursoSeleccionado = {}
+  let alumnos = []
+  let currentPage = 1
+  const rowsPerPage = 5
+
   const selectCurso = document.getElementById('select-curso')
+  const paginationStart = document.getElementById('paginationStart')
+  const paginationEnd = document.getElementById('paginationEnd')
+  const totalPagination = document.getElementById('totalPagination')
+  const previousPageBtn = document.getElementById('previousPage')
+  const nextPageBtn = document.getElementById('nextPage')
 
   document.addEventListener('DOMContentLoaded', async () => {
     payload = obtenerToken()
@@ -87,165 +99,132 @@ import DropdownButton from '../components/dropdownButton.astro';
   }
 
   async function cargarDatos(){
-    try {
-        const resCursos = await fetch(`http://localhost:4000/api/curso/personal/${payload.id}/cursos`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-          }
-        })
+    const resCursos = await fetch(`http://localhost:4000/api/curso/personal/${payload.id}/cursos`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    const data = await resCursos.json()
+    cursos = data.body
 
-      if (!resCursos.ok) {
-        console.error('Error al traer cursos')
-        return
-      }
+    selectCurso.innerHTML = `<option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>`
+    cursos.forEach(curso => {
+      const option = document.createElement('option')
+      option.value = curso.id
+      option.innerText = curso.nombre
+      selectCurso.appendChild(option)
+    })
 
-      const data = await resCursos.json()
-      cursos = data.body
-
-      selectCurso.innerHTML = `<option class="bg-gray-200" value="" disabled selected>Seleccionar curso</option>`
-
-      if (cursos.length > 0) {
-        cursos.forEach(curso => {
-          console.log(curso)
-          const option = document.createElement('option')
-          option.value = curso.id
-          option.innerText = curso.nombre
-          selectCurso.appendChild(option)
-        })
-      }
-
-      selectCurso.addEventListener('change',async (e)=>{
-        cursoSeleccionado = cursos.find(curso => curso.id == e.target.value)
-        await cargarDatosTabla()
-      })
-
-    } catch (error) {
-      
-    }
+    selectCurso.addEventListener('change', async (e) => {
+      cursoSeleccionado = cursos.find(curso => curso.id == e.target.value)
+      alumnos = await fetchAlumnos()
+      currentPage = 1
+      renderPage()
+    })
   }
 
-  async function cargarDatosTabla(){
-    const alumnos = await fetchAlumnos() 
-    const tbody = document.getElementById('tbody')
-    tbody.innerHTML = ''
-    alumnos.forEach(alumno => {
-      const tr = document.createElement('tr')
+ function renderPage(currentData = alumnos) {
+  const tbody = document.getElementById('tbody')
+  tbody.innerHTML = ''
+  const start = (currentPage - 1) * rowsPerPage
+  const end = start + rowsPerPage
+  const pageData = currentData.slice(start, end)
 
-      const thDni = document.createElement('th')
-      thDni.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs'
-      thDni.textContent = alumno.dni
+  pageData.forEach(alumno => {
+    const tr = document.createElement('tr')
+    tr.innerHTML = `
+      <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${alumno.dni}</th>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${alumno.nombre} ${alumno.apellido}</td>
+      <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${alumno.nota === null ? 'Sin nota' : alumno.nota}</td>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+        <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 text-white text-xs cargar-nota-btn">Cargar nota</button>
+      </td>
+    `
+    const btn = tr.querySelector('.cargar-nota-btn')
+    btn.addEventListener('click', () => abrirModal(alumno))
+    tbody.appendChild(tr)
+  })
 
-      const tdNombre = document.createElement('td')
-      tdNombre.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
-      tdNombre.textContent = `${alumno.nombre} ${alumno.apellido}`
+  paginationStart.textContent = start + 1
+  paginationEnd.textContent = Math.min(end, currentData.length)
+  totalPagination.textContent = currentData.length
 
-      const tdEstado = document.createElement('td')
-      tdEstado.className = 'border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs'
-      tdEstado.textContent =`${alumno.nota === null? 'Sin nota': alumno.nota}`
+  previousPageBtn.disabled = currentPage === 1
+  nextPageBtn.disabled = currentPage >= Math.ceil(currentData.length / rowsPerPage)
+}
 
-      const tdOpciones = document.createElement('td')
-      tdOpciones.className = 'border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4'
 
-      const btn = document.createElement('button')
-      btn.className = 'mr-2 rounded-3xl bg-blue-700 py-1 px-3 text-white text-xs'
-      btn.textContent = 'Cargar nota'
-
-      btn.addEventListener('click',(e)=> {
-        const modal = document.createElement('DIV')
-        modal.innerHTML = `
-            <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-              <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
-                <h2 class="text-xl font-semibold text-gray-800">Cargar Nota</h2>
-                <p><strong>Nota: ${alumno.nota === null? 'Sin calificar' : alumno.nota}</strong></p>
-                <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">
-                  Calificación
-                </label>
-                <input class="  appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="nota" type="text" placeholder="0.00">
-                <div class="flex justify-end gap-2">
-                  <button id="calificarModal" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500">Calificar</button>
-                  <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
-                </div>
-              </div>
-            </div>`
-        document.body.appendChild(modal)
-        document.getElementById('calificarModal').addEventListener('click',async ()=>{
-          try {
-            const nota = document.getElementById('nota').value
-            const resCalificar = await fetch(`http://localhost:4000/api/curso/cargarNotaCursado`, {
-              method: 'PATCH',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify({
-                nota: nota,
-                cursoId : alumno.curso_id,
-                alumnoId : alumno.id
-              })
-            })
-
-            if (!resCalificar.ok) {
-              ModalConfirmacion(false)
-              return
-            }
-            modal.remove()
-            ModalConfirmacion(true)
-            await cargarDatosTabla()
-          } catch (error) {
-            ModalConfirmacion(false)
-          }
-        })
-        document.getElementById('cancelarModal').addEventListener('click',()=> modal.remove())
-      })
-
-      tdOpciones.appendChild(btn)
-      tr.appendChild(thDni)
-      tr.appendChild(tdNombre)
-      tr.appendChild(tdEstado)
-      tr.appendChild(tdOpciones)
-      tbody.appendChild(tr)
-    });
-  }
+  previousPageBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPage() } })
+  nextPageBtn.addEventListener('click', () => { if (currentPage < Math.ceil(alumnos.length / rowsPerPage)) { currentPage++; renderPage() } })
 
   async function fetchAlumnos() {
-    try {
-      const resNotasCurso = await fetch(`http://localhost:4000/api/curso/${cursoSeleccionado.id}/notasDelCurso`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-
-      if (!resNotasCurso.ok) {
-        console.error('Error al traer el alumno')
-        return null
-      }
-
-      const dataNotasCurso = await resNotasCurso.json()
-      console.log(dataNotasCurso)
-      return dataNotasCurso.body
-    } catch (error) {
-      console.error(error)
-      return null
-    }
+    const res = await fetch(`http://localhost:4000/api/curso/${cursoSeleccionado.id}/notasDelCurso`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+    const data = await res.json()
+    return data.body
   }
 
-function ModalConfirmacion(estado){
-  const modalConfirmacion = document.createElement('DIV')
-  modalConfirmacion.innerHTML = `
-    <div id="modal-confirmacion" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg flex flex-col items-center space-y-4 relative">
-        <h2 class="text-lg font-semibold text-gray-800 text-center">${estado? 'Guardado con éxito': 'Error al guardar'}</h2>
-        ${estado? '<p class="text-base text-gray-500 text-center">Los cambios solo se verán al actualizar la página</p>' :''}
-        <button id="cerrar" class="px-4 py-2 ${estado? 'bg-green-700 hover:bg-green-600': 'bg-red-700 hover:bg-red-600'} text-white rounded">Aceptar</button>
-      </div>
-    </div>`
-  document.body.appendChild(modalConfirmacion)
-  document.getElementById('cerrar').addEventListener('click', () => modalConfirmacion.remove())
-}
+  function abrirModal(alumno) {
+    const modal = document.createElement('DIV')
+    modal.innerHTML = `
+      <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+          <h2 class="text-xl font-semibold text-gray-800">Cargar Nota</h2>
+          <p><strong>Nota actual: ${alumno.nota === null ? 'Sin calificar' : alumno.nota}</strong></p>
+          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Calificación</label>
+          <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="nota" type="text" placeholder="0.00">
+          <div class="flex justify-end gap-2">
+            <button id="calificarModal" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500">Calificar</button>
+            <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
+          </div>
+        </div>
+      </div>`
+    document.body.appendChild(modal)
+
+    document.getElementById('calificarModal').addEventListener('click', async () => {
+      const notaValue = document.getElementById('nota').value
+      const res = await fetch(`http://localhost:4000/api/curso/cargarNotaCursado`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ nota: notaValue, cursoId: alumno.curso_id, alumnoId: alumno.id })
+      })
+      if (!res.ok) {
+        ModalConfirmacion(false)
+        return
+      }
+      modal.remove()
+      ModalConfirmacion(true)
+      alumnos = await fetchAlumnos()
+      renderPage()
+    })
+    document.getElementById('cancelarModal').addEventListener('click', () => modal.remove())
+  }
+
+  function ModalConfirmacion(estado) {
+    const modalConfirmacion = document.createElement('DIV')
+    modalConfirmacion.innerHTML = `
+      <div id="modal-confirmacion" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg flex flex-col items-center space-y-4 relative">
+          <h2 class="text-lg font-semibold text-gray-800 text-center">${estado ? 'Guardado con éxito' : 'Error al guardar'}</h2>
+          ${estado ? '<p class="text-base text-gray-500 text-center">Los cambios solo se verán al actualizar la página</p>' : ''}
+          <button id="cerrar" class="px-4 py-2 ${estado ? 'bg-green-700 hover:bg-green-600' : 'bg-red-700 hover:bg-red-600'} text-white rounded">Aceptar</button>
+        </div>
+      </div>`
+    document.body.appendChild(modalConfirmacion)
+    document.getElementById('cerrar').addEventListener('click', () => modalConfirmacion.remove())
+  }
+
+document.getElementById('search-by-dni').addEventListener('input', () => {
+  const filtro = document.getElementById('search-by-dni').value.trim()
+  currentPage = 1
+
+  if (filtro === "") {
+    renderPage()
+  } else {
+    const filteredData = alumnos.filter(item => String(item.dni).startsWith(filtro))
+    renderPage(filteredData)
+  }
+})
+
 
 
 </script>

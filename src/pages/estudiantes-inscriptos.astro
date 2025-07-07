@@ -5,9 +5,29 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 <DashboardLayout title="Alumnos inscriptos" path='Alumnos inscriptos' pageTitle='Alumnos inscriptos'>
   <div class="flex items-center space-x-4 ml-10">
     <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-lg" href="/inscribir-alumno">Inscribir alumno</a>
-    <select id="select-anio" class="rounded-3xl w-[200px] bg-blue-700 px-4 py-1.5 text-white text-lg">
-      <option value="">Todos los años</option>
-    </select>
+    <div class="relative w-[250px]">
+      <select id="select-anio" class="appearance-none w-full leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg">
+        <option value="">Todos los años</option>
+      </select>
+      <i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black"></i>
+    </div>
+    <div class="relative w-[250px]">
+      <select id="select-curso" class="appearance-none w-full leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg">
+        <option value="">Todos los cursos</option>
+      </select>
+      <i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black"></i>
+    </div>
+    <div class="relative w-[250px]">
+      <select id="select-estado" class="appearance-none w-full leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg">
+        <option value="">Todos los estados</option>
+        <option value="cursando">Cursando</option>
+        <option value="egresado">Egresado</option>
+        <option value="abandonado">Abandonodo</option>
+      </select>
+      <i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black"></i>
+    </div>
+
+
   </div>
   <span class="float-right mr-14">
     <span class="text-sm text-gray-700">Descargar como:</span>
@@ -36,6 +56,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Nombre</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Apellido</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Curso</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Estado</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Opciones</th>
               </tr>
             </thead>
@@ -61,8 +82,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 }
 </style>
 
-<script>
-//@ts-nocheck
+<script>//@ts-nocheck
 import { downloadCsv } from '../components/downloadTable'
 import { moreInfoRow } from '../components/moreInfoRow'
 
@@ -74,6 +94,7 @@ let currentEnd = currentStart + limitcolums
 const token = localStorage.getItem('token')
 
 const selectAnio = document.getElementById('select-anio')
+const selectCurso = document.getElementById('select-curso')
 
 async function fetchData() {
   const response = await fetch('http://localhost:4000/api/curso/alumnos-cursos', {
@@ -82,22 +103,54 @@ async function fetchData() {
   const json = await response.json()
   let rawData = json.body
 
-  // Filtrar SOLO los que tienen estado "cursando"
-  rawData = rawData.filter(item => item.estado_terminacion === 'cursando')
-
   data = rawData
 
-  // Obtener años únicos
-  const anios = [...new Set(data.map(d => d.anio))].sort()
-  anios.forEach(anio => {
+  // Poblar select de años
+const anios = [...new Set(data.map(d => parseInt(d.anio)))].sort((a, b) => b - a)
+anios.forEach(anio => {
+  const opt = document.createElement('option')
+  opt.value = anio
+  opt.textContent = anio
+  selectAnio.appendChild(opt)
+})
+
+
+  // Poblar select de cursos
+  const cursos = [...new Set(data.map(d => d.curso_nombre))]
+  cursos.forEach(curso => {
     const opt = document.createElement('option')
-    opt.value = anio
-    opt.textContent = anio
-    selectAnio.appendChild(opt)
+    opt.value = curso
+    opt.textContent = curso
+    selectCurso.appendChild(opt)
   })
 
   filteredData = [...data]
 }
+
+function filtrarDatos() {
+  const selectedAnio = selectAnio.value
+  const selectedCurso = selectCurso.value
+  const selectedEstado = selectEstado.value
+
+  filteredData = data
+
+  if (selectedAnio) {
+    filteredData = filteredData.filter(item => String(item.anio) === selectedAnio)
+  }
+
+  if (selectedCurso) {
+    filteredData = filteredData.filter(item => item.curso_nombre === selectedCurso)
+  }
+
+  if (selectedEstado) {
+    filteredData = filteredData.filter(item => item.estado_terminacion === selectedEstado)
+  }
+
+  currentStart = 0
+  currentEnd = currentStart + limitcolums
+  renderPage()
+}
+
 
 function renderPage(currentData = filteredData) {
   const tbody = document.getElementById('tbody')
@@ -112,6 +165,7 @@ function renderPage(currentData = filteredData) {
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.nombre}</td>
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.apellido}</td>
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.curso_nombre}</td>
+      <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.estado_terminacion}</td>
       <td class="border-t-0 px-6 p-4">
         <button class="rounded-3xl bg-red-600 w-6 h-6 eliminarCurso" 
                 data-alumno-id="${item.id_alumno}" 
@@ -120,11 +174,12 @@ function renderPage(currentData = filteredData) {
           <i class="fa-solid fa-xmark" style="color: #000000;"></i>
         </button>
       </td>
-    `
+`
+
     tbody.appendChild(tr)
   })
 
-  // Asignar eventos a cada botón de eliminar
+  // Botones eliminar
   const botonesEliminar = document.querySelectorAll('.eliminarCurso')
   botonesEliminar.forEach(btn => {
     btn.addEventListener('click', () => {
@@ -144,13 +199,11 @@ function renderPage(currentData = filteredData) {
           })
 
           if (!res.ok) {
-            throw new Error('Error al cambiar el estado a abandono')
+            throw new Error('Error al quitar alumno')
           }
 
           await fetchData()
-          currentStart = 0
-          currentEnd = currentStart + limitcolums
-          renderPage()
+          filtrarDatos()
         } catch (error) {
           console.error(error)
         }
@@ -161,8 +214,6 @@ function renderPage(currentData = filteredData) {
   checkButton()
 }
 
-
-
 function checkButton() {
   const btnPrev = document.getElementById('previousPage')
   const btnNext = document.getElementById('nextPage')
@@ -170,7 +221,6 @@ function checkButton() {
   btnPrev.disabled = currentStart === 0
   btnNext.disabled = currentStart + limitcolums >= filteredData.length
 
-  // Aplicar clases visuales
   if (btnPrev.disabled) {
     btnPrev.classList.add('disable-button')
     btnPrev.classList.remove('hover:bg-gray-900')
@@ -192,7 +242,6 @@ function checkButton() {
   document.getElementById('totalPagination').textContent = filteredData.length
 }
 
-
 document.getElementById('nextPage').addEventListener('click', () => {
   if (currentStart + limitcolums < filteredData.length) {
     currentStart += limitcolums
@@ -210,18 +259,13 @@ document.getElementById('previousPage').addEventListener('click', () => {
 })
 
 selectAnio.addEventListener('change', () => {
-  const selected = selectAnio.value
-  if (!selected) {
-    filteredData = [...data]
-  } else {
-    filteredData = data.filter(item => String(item.anio) === selected)
-  }
-  currentStart = 0
-  currentEnd = currentStart + limitcolums
-  renderPage()
+  filtrarDatos()
 })
 
-// Filtro DNI
+selectCurso.addEventListener('change', () => {
+  filtrarDatos()
+})
+
 document.getElementById('search-by-dni').addEventListener('input', e => {
   const filtro = e.target.value.trim()
   currentStart = 0
@@ -245,7 +289,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 })
 
 function ModalConfirmarEliminacion(onConfirm) {
-  // Primero eliminar cualquier modal anterior si existe
   const modalExistente = document.getElementById('modal-confirmar')
   if (modalExistente) modalExistente.remove()
 
@@ -264,7 +307,6 @@ function ModalConfirmarEliminacion(onConfirm) {
   `
   document.body.appendChild(modal)
 
-  // Asignar listeners
   const btnConfirmar = document.getElementById('confirmarEliminar')
   const btnCancelar = document.getElementById('cancelarEliminar')
 
@@ -277,5 +319,11 @@ function ModalConfirmarEliminacion(onConfirm) {
     modal.remove()
   })
 }
+
+const selectEstado = document.getElementById('select-estado')
+selectEstado.addEventListener('change', () => {
+  filtrarDatos()
+})
+
 
 </script>

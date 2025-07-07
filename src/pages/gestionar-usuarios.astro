@@ -2,8 +2,8 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title="Gestión de usuarios" path='Gestion de usuarios' pageTitle=' Gestión de usuarios'>
-      <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-sm ml-10 mr-0" href="/agregar-usuario">Agregar usuario</a>
+<DashboardLayout title="Gestionar usuarios" path='Gestionar usuarios' pageTitle='Gestionar usuarios'>
+      <a class="rounded-3xl bg-blue-700 px-10 py-1.6 text-white text-lg ml-10 mr-0" href="/agregar-usuario">Agregar usuario</a>
       <span class="float-right mr-14">
         <span class="text-sm text-gray-700">Descargar como:</span>
         <i id="download-csv" class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
@@ -51,16 +51,10 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                 <div class="inline-flex mt-2 xs:mt-0">
                   <!-- Buttons -->
                   <button id="previousPage" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 rounded-s hover:bg-gray-900">
-                      <svg class="w-3.5 h-3.5 me-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5H1m0 0 4 4M1 5l4-4"/>
-                      </svg>
                       Anterior
                   </button>
                   <button id="nextPage" class="flex items-center justify-center px-3 h-8 text-sm font-medium text-white bg-gray-800 border-0 border-s border-gray-700 rounded-e hover:bg-gray-900 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                       Siguiente
-                      <svg class="w-3.5 h-3.5 ms-2 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 10">
-                      <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M1 5h12m0 0L9 1m4 4L9 9"/>
-                    </svg>
                   </button>
                 </div>
               </div>
@@ -69,267 +63,201 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <style>
   .disable-button{
-    color: gray;
+    background-color: gray;
   }
 </style>
-
 <script>
-  //@ts-nocheck 
-  import { downloadCsv } from '../components/downloadTable'
-  import { moreInfoRow } from '../components/moreInfoRow'
+//@ts-nocheck 
+import { downloadCsv } from '../components/downloadTable'
+import { moreInfoRow } from '../components/moreInfoRow'
 
-  //VARIABLES
-  let data = null
-  const limitcolums = 5
-  const pag = 0
-  let filteredData = null
-  let currentStart = 0
-  let currentEnd = currentStart + limitcolums
-  const token = localStorage.getItem('token')
+let data = null
+const rowsPerPage = 5
+let currentPage = 1
+const token = localStorage.getItem('token')
+
+const btnNext = document.getElementById('nextPage')
+const btnPrev = document.getElementById('previousPage')
+const pStart = document.getElementById('paginationStart')
+const pEnd = document.getElementById('paginationEnd')
+const pTotal = document.getElementById('totalPagination')
+const tableBody = document.getElementById('tbody')
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadData()
+})
+
+async function fetchData() {
+    const responseStudent = await fetch('http://localhost:4000/api/alumno', {
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    })
+    const responsePersonnel = await fetch('http://localhost:4000/api/personal', {
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+    })
+    
+    const jsonStudent = await responseStudent.json()
+    const jsonPersonnel = await responsePersonnel.json()
+    
+    const dataStudent = jsonStudent.body.map(ds => ({ ...ds, tipo: 'alumno' }))
+    const dataPersonnel = jsonPersonnel.body.map(dp => ({ ...dp, tipo: 'personal' }))
+    
+    data = [...dataStudent, ...dataPersonnel]
+    data.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
+  return data
+}
+
+async function loadData() {
+  data = await fetchData()
+  renderPage()
+}
+
+function renderPage(currentData = data) {
+  tableBody.innerHTML = ""
   
-  document.querySelector('#tbody').addEventListener('click', async function(e) { // Funcion que despliega la ventana modal de mas informacion
-  if (e.target && e.target.id.startsWith('MoreInfo')) {
-    const targetDni = parseInt(e.target.parentElement.parentElement.parentElement.firstElementChild.innerHTML) 
-    let targetuser = '' 
+  const start = (currentPage - 1) * rowsPerPage
+  const end = start + rowsPerPage
+  const paginated = currentData.slice(start, end)
 
-    data.forEach(data => {
-      if(data.dni === targetDni){
-        targetuser = data
-        return
-      }
-    });
+  paginated.forEach(item => {
+    tableBody.innerHTML += `<tr>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${item.dni}</td>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.nombre}</td>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.apellido}</td>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.tipo}</td>
+      <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+        <span>
+          <button id="MoreInfo" class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 text-white text-xs">Más Información</button>
+          <a href="/editar-usuario?id=${encodeURIComponent(item.id)}&tipo=${encodeURIComponent(item.tipo)}"
+            class="inline-block rounded-3xl bg-sky-400 w-6 h-6 text-center align-middle">
+            <i class="fa-solid fa-pen-to-square text-xs leading-6" style="color: #000000;"></i>
+          </a>
+          <button id="deleteButton" data-id="${item.id}" class="rounded-3xl bg-red-600 w-6 h-6 text-black">x</button>
+        </span>
+      </td>
+    </tr>`
+  })
+
+  updatePagination(currentData.length)
+}
+
+function updatePagination(total) {
+  const start = (currentPage - 1) * rowsPerPage + 1
+  const end = Math.min(currentPage * rowsPerPage, total)
+
+  pStart.textContent = start
+  pEnd.textContent = end
+  pTotal.textContent = total
+
+  btnPrev.disabled = currentPage === 1
+  btnNext.disabled = currentPage * rowsPerPage >= total
+
+  btnPrev.classList.toggle('disable-button', btnPrev.disabled)
+  btnNext.classList.toggle('disable-button', btnNext.disabled)
+}
+
+btnNext.addEventListener('click', () => {
+  currentPage++
+  renderPage()
+})
+
+btnPrev.addEventListener('click', () => {
+  currentPage--
+  renderPage()
+})
+
+document.getElementById('mainDiv')?.addEventListener('click', function(e) {
+  if (e.target.id === 'closeModal') {
+    closeModal()
+  }
+})
+
+function closeModal() {
+  document.getElementById('modal')?.remove()
+}
+
+document.getElementById('tbody').addEventListener('click', async function(e) {
+  if (e.target && e.target.id === 'MoreInfo') {
+    const dni = parseInt(e.target.closest('tr').firstElementChild.textContent)
+    const targetUser = data.find(user => user.dni === dni)
 
     const div = document.createElement('DIV')
-
     div.innerHTML = `
-            <div id="modal" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
-            <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
-
-            <!-- Título -->
-            <h2 class="text-3xl font-bold text-blue-600 mb-6 border-b-2 border-blue-500 pb-2 text-center">
-                Información detallada
-            </h2>
-
-            <!-- Contenido -->
-            <div class="space-y-4 text-gray-700 text-sm">
-              ${moreInfoRow('Nombre y apellido', `${targetuser.nombre} ${targetuser.apellido}`)}
-              ${moreInfoRow('DNI', targetuser.dni)}
-              ${moreInfoRow('Correo', targetuser.correo)}
-              ${moreInfoRow('Teléfono', targetuser.telefono)}
-              ${moreInfoRow('Ocupación', targetuser.ocupacion)}
-              ${moreInfoRow('Fecha de nacimiento', targetuser.fecha_nacimiento.split('T')[0])}
-
-              ${targetuser.tipo === 'alumno'
-                ? `
-                  ${moreInfoRow('Nacionalidad', targetuser.nacionalidad)}
-                  ${moreInfoRow('Domicilio', targetuser.domicilio)}
-                  ${moreInfoRow('Nivel de estudio', targetuser.nivel_estudio)}
-                  ${moreInfoRow('Discapacidad', targetuser.discapacidad)}
-                  ${moreInfoRow('Programa social', targetuser.programa_social)}
-                  ${moreInfoRow('Estado civil', targetuser.estado_civil)}
-                `
-                : ''}
-            </div>
-
-            <!-- Botón de cierre -->
-            <div class="flex justify-end mt-8">
-                <button id="closeModal" 
-                        class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200">
-                    Cerrar
-                </button>
-            </div>
+      <div id="modal" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
+          <h2 class="text-3xl font-bold text-blue-600 mb-6 border-b-2 border-blue-500 pb-2 text-center">Información detallada</h2>
+          <div class="space-y-4 text-gray-700 text-sm">
+            ${moreInfoRow('Nombre y apellido', `${targetUser.nombre} ${targetUser.apellido}`)}
+            ${moreInfoRow('DNI', targetUser.dni)}
+            ${moreInfoRow('Correo', targetUser.correo)}
+            ${moreInfoRow('Teléfono', targetUser.telefono)}
+            ${moreInfoRow('Ocupación', targetUser.ocupacion)}
+            ${moreInfoRow('Fecha de nacimiento', targetUser.fecha_nacimiento.split('T')[0])}
+            ${targetUser.tipo === 'alumno' ? `
+              ${moreInfoRow('Nacionalidad', targetUser.nacionalidad)}
+              ${moreInfoRow('Domicilio', targetUser.domicilio)}
+              ${moreInfoRow('Nivel de estudio', targetUser.nivel_estudio)}
+              ${moreInfoRow('Discapacidad', targetUser.discapacidad)}
+              ${moreInfoRow('Programa social', targetUser.programa_social)}
+              ${moreInfoRow('Estado civil', targetUser.estado_civil)}
+            ` : ''}
+          </div>
+          <div class="flex justify-end mt-8">
+            <button id="closeModal" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200">Cerrar</button>
+          </div>
         </div>
-        </div>
-    `
-    const mainDiv = document.querySelector('#mainDiv')
-    mainDiv?.appendChild(div)
+      </div>`
+    document.querySelector('#mainDiv')?.appendChild(div)
   }
 
-  if (e.target && e.target.id.startsWith('deleteButton')) {
-    const id = e.target.dataset.id;
+  if (e.target && e.target.id === 'deleteButton') {
+    const id = e.target.dataset.id
 
-    const div = document.createElement('DIV');
+    const div = document.createElement('DIV')
     div.innerHTML = `
       <div id="modal" class="fixed inset-0 flex items-center justify-center">
-          <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
-              <h2 class="text-3xl font-bold text-black text-center">
-                  ¿Está seguro de que desea eliminar a este usuario?
-              </h2>
-              <div class="flex mt-4">
-                  <button id="deleteUser"
-                          class="bg-red-500 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200 flex-start">
-                      Eliminar
-                  </button>
-                  <button id="closeModal"
-                          class="bg-white hover:bg-gray-200 text-black font-semibold ml-40 px-6 py-3 rounded-lg shadow-md transition-all duration-200">
-                      Cancelar
-                  </button>
-              </div>
+        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
+          <h2 class="text-3xl font-bold text-black text-center">¿Está seguro de que desea eliminar a este usuario?</h2>
+          <div class="flex mt-4">
+            <button id="deleteUser" class="bg-red-500 hover:bg-red-700 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200 flex-start">Eliminar</button>
+            <button id="closeModal" class="bg-white hover:bg-gray-200 text-black font-semibold ml-40 px-6 py-3 rounded-lg shadow-md transition-all duration-200">Cancelar</button>
           </div>
-      </div>
-    `;
-
-    document.querySelector('#mainDiv')?.appendChild(div);
+        </div>
+      </div>`
+    document.querySelector('#mainDiv')?.appendChild(div)
 
     document.getElementById("deleteUser").addEventListener("click", async () => {
       try {
         const response = await fetch('http://localhost:4000/api/alumno', {
-          method: "PUT", // confirmado por Insomnia
-          headers: {
-            "Content-Type": "application/json",
-            'Authorization': `Bearer ${token}`
-          },
-          body: JSON.stringify({ id: parseInt(id) }) // <- asegúrate que sea un número
-        });
+          method: "PUT",
+          headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({ id: parseInt(id) })
+        })
 
-        if (!response.ok) {
-          throw new Error(`Error al eliminar el elemento: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(`Error al eliminar: ${response.statusText}`)
 
-        const result = await response.json();
-        console.log(`Elemento con ID ${id} eliminado:`, result);
+        document.getElementById("modal")?.remove()
 
-        document.getElementById("modal")?.remove(); // Cierra modal
-        e.target.closest("tr")?.remove(); // Opcional: eliminar la fila del DOM
+        loadData()
       } catch (error) {
-        console.error("Hubo un error:", error);
+        console.error("Error:", error)
       }
-    });
+    })
   }
 })
 
-  document.querySelector('#mainDiv')?.addEventListener('click', function(e) {
-      if (e.target.id === 'closeModal') {
-          closeModal()
-      }
-  })
+document.getElementById('search-by-dni').addEventListener('input', () => {
+  const filtro = document.getElementById('search-by-dni').value.trim()
+  currentPage = 1
 
-  function closeModal() {
-      document.getElementById('modal')?.remove()  // Elimina el modal del DOM
-  }
-
-async function fetchData(){
-    if(!data){
-      const responseStudent = await fetch('http://localhost:4000/api/alumno',{
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      const responsePersonnel = await fetch('http://localhost:4000/api/personal',{
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        }
-      })
-      
-      const jsonStudent = await responseStudent.json()
-      const jsonPersonnel = await responsePersonnel.json()
-      
-      const dataStudent = jsonStudent.body.map(ds => ({ ...ds, tipo: 'alumno' }));
-      const dataPersonnel = jsonPersonnel.body.map(dp => ({ ...dp, tipo: 'personal' }));
-      
-      data = [...dataStudent,...dataPersonnel]
-
-      data.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion));
-    }
-
-    return data
-}
-
-async function loadData(){
-    let tableContent =document.querySelector('#tbody')
-    if(tableContent.rows.length === 0){
-      data = await fetchData()
-      renderPage()
-    }
-}
-
-//Cargar tabla al iniciar
-addEventListener('DOMContentLoaded',()=> loadData())
-
-  const btnNext = document.querySelector('#nextPage') as HTMLButtonElement
-  btnNext.addEventListener('click', () => {
-    if (currentStart + limitcolums < data.length) {
-      currentStart += limitcolums
-      currentEnd = Math.min(currentStart + limitcolums, data.length)
-      renderPage()
-    }
-  })
-  
-  const btnPrev = document.querySelector('#previousPage') as HTMLButtonElement
-  btnPrev.addEventListener('click', () => {
-    if (currentStart - limitcolums >= 0) {
-      currentStart -= limitcolums
-      currentEnd = currentStart + limitcolums
-      renderPage()
-    }
-  })
-
-function checkButton(){
-  btnPrev.disabled = currentStart === 0
-  btnNext.disabled = !Array.isArray(data) || currentStart + limitcolums >= data.length
-
-  btnPrev.classList.toggle('disable-button', btnPrev.disabled)
-  btnPrev.classList.toggle('hover:bg-gray-900', !btnPrev.disabled)
-  btnNext.classList.toggle('disable-button', btnNext.disabled)
-  btnNext.classList.toggle('hover:bg-gray-900', !btnNext.disabled)
-
-  const pStart = document.querySelector('#paginationStart')
-  const pEnd = document.querySelector('#paginationEnd')
-  const pTotal = document.querySelector('#totalPagination')
-  pStart.innerHTML = currentStart + 1 // para que no muestre "0"
-  pEnd.innerHTML = Math.min(currentEnd, data.length)
-  pTotal.innerHTML = data.length
-}
-
-function renderPage(currentData = data) {
-    const tableContent = document.querySelector('#tbody')
-    tableContent.innerHTML = ""
-
-    const paginated = currentData.slice(currentStart, currentEnd)
-
-    paginated.forEach(item => {
-      tableContent.innerHTML += `<tr>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${item.dni}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.nombre}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.apellido}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.tipo}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-          <span>
-            <button id="MoreInfo" class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 text-white text-xs">Más Información</button>
-            <a href="/editar-usuario?id=${encodeURIComponent(item.id)}&tipo=${encodeURIComponent(item.tipo)}"
-              class="inline-block rounded-3xl bg-sky-400 w-6 h-6 text-center align-middle">
-              <i class="fa-solid fa-pen-to-square text-xs leading-6" style="color: #000000;"></i>
-            </a>
-            <button id="deleteButton" data-id="${item.id}" class="rounded-3xl bg-red-600 w-6 h-6 text-black">x</button>
-          </span>
-        </td>
-      </tr>`
-    })
-
-    checkButton()
-  }
-
-// Busqueda por dni
-const inputBusquedaDNI = document.querySelector('#search-by-dni')
-inputBusquedaDNI.addEventListener('input', () => {
-  const filtro = inputBusquedaDNI.value.trim()
-  let filteredData = null
-  currentStart = 0
-  
-  if(filtro === ""){
+  if (filtro === "") {
     renderPage(data)
-  }
-  else{
-    filteredData = data.filter(item => String(item.dni).startsWith(filtro))
+  } else {
+    const filteredData = data.filter(item => String(item.dni).startsWith(filtro))
     renderPage(filteredData)
   }
 })
 
-document.querySelector('#download-csv')?.addEventListener("click", async () => {
-  downloadCsv(data,'tabla-usuarios')
-});
+document.getElementById('download-csv')?.addEventListener("click", async () => {
+  downloadCsv(data, 'tabla-usuarios')
+})
 </script>

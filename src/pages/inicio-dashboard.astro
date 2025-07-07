@@ -3,5 +3,189 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
 <DashboardLayout title='Dashboard escolar' path='' pageTitle='Inicio'>
+  <div class="w-full p-6">
+    <h1 id="saludo" class="text-3xl font-bold text-gray-800 mb-4">¡Bienvenido al sistema EFP N°31!</h1>
+    <p class="text-gray-600 mb-4">Desde aquí podés acceder rápidamente a la información general y funcionalidades según tu rol.</p>
 
+    <!-- Contenido administrador -->
+    <div id="admin-content" class="hidden">
+      <div class="flex items-center mb-6">
+        <label for="select-anio" class="mr-2 font-medium text-gray-700">Seleccionar año:</label>
+        <select id="select-anio" class="border border-gray-300 rounded px-3 py-1 focus:outline-none focus:ring focus:border-blue-300"></select>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+          <span class="text-4xl">📄</span>
+          <p class="text-lg font-semibold mt-2">Cursos activos</p>
+          <p id="cursos-activos" class="text-2xl font-bold text-blue-700">-</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+          <span class="text-4xl">👨‍🎓</span>
+          <p id="titulo-alumnos" class="text-lg font-semibold mt-2">Alumnos activos</p>
+          <p id="alumnos-activos" class="text-2xl font-bold text-green-700">-</p>
+        </div>
+        <div class="bg-white rounded-xl shadow p-4 flex flex-col items-center">
+          <span class="text-4xl">❌</span>
+          <p class="text-lg font-semibold mt-2">Abandonos</p>
+          <p id="abandonos" class="text-2xl font-bold text-red-700">-</p>
+        </div>
+      </div>
+
+      <div id="admin-buttons" class="flex flex-wrap gap-4">
+        <!-- Botones administrador se llenan dinámicamente -->
+      </div>
+    </div>
+
+    <!-- Contenido profesor -->
+    <div id="prof-content" class="hidden space-y-6">
+      <div class="bg-white rounded-xl shadow p-4">
+        <h2 class="text-xl font-bold text-gray-800 mb-4">Tus cursos activos</h2>
+        <ul id="lista-cursos" class="list-disc list-inside text-gray-700"></ul>
+      </div>
+
+      <div class="bg-white rounded-xl shadow p-4 flex items-center justify-between">
+        <p class="text-lg font-semibold text-gray-800">Alumnos totales este año:</p>
+        <span id="total-alumnos" class="text-2xl font-bold text-green-700">-</span>
+      </div>
+
+      <div id="prof-buttons" class="flex flex-wrap gap-4">
+        <!-- Botones profesor se llenan dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    //@ts-nocheck
+
+    function decodeToken(token) {
+      try {
+        const payload = token.split('.')[1]
+        return JSON.parse(atob(payload))
+      } catch (e) {
+        console.error("Token inválido")
+        return {}
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const token = localStorage.getItem('token')
+      if (!token) return
+
+      const { id: id_personal, nombre, ocupacion } = decodeToken(token)
+
+      if (ocupacion !== 'administrador' && ocupacion !== 'profesor') {
+        window.location.href = '/no-autorizado'
+        return
+      }
+
+      if (ocupacion === 'administrador') {
+        document.getElementById('admin-content').classList.remove('hidden')
+
+        const adminButtons = document.getElementById('admin-buttons')
+        adminButtons.innerHTML = `
+          <a href="/informacion-cursos" class="bg-blue-700 text-white px-5 py-2 rounded-full shadow hover:bg-blue-800 transition">Información sobre cursos</a>
+          <a href="/gestionar-cursos" class="bg-green-700 text-white px-5 py-2 rounded-full shadow hover:bg-green-800 transition">Gestionar cursos</a>
+          <a href="/gestionar-aulas-y-horarios" class="bg-indigo-700 text-white px-5 py-2 rounded-full shadow hover:bg-indigo-800 transition">Gestión aulas y horarios</a>
+          <a href="/gestionar-usuarios" class="bg-purple-700 text-white px-5 py-2 rounded-full shadow hover:bg-purple-800 transition">Gestionar usuarios</a>
+          <a href="/estudiantes-inscriptos" class="bg-pink-700 text-white px-5 py-2 rounded-full shadow hover:bg-pink-800 transition">Gestión de inscripciones</a>
+          <a href="/titulacion" class="bg-yellow-600 text-white px-5 py-2 rounded-full shadow hover:bg-yellow-700 transition">Titulación</a>
+        `
+
+        try {
+          const resCursos = await fetch('http://localhost:4000/api/curso', {
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+          })
+          const jsonCursos = await resCursos.json()
+          document.getElementById('cursos-activos').textContent = jsonCursos.body.length
+
+          const resAlumnos = await fetch('http://localhost:4000/api/curso/alumnos-cursos', {
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+          })
+          const jsonAlumnos = await resAlumnos.json()
+          const alumnos = jsonAlumnos.body
+
+          const anios = [...new Set(alumnos.map(a => a.anio))].sort((a, b) => b - a)
+          const selectAnio = document.getElementById('select-anio')
+
+          anios.forEach(anio => {
+            const opt = document.createElement('option')
+            opt.value = anio
+            opt.textContent = anio
+            selectAnio.appendChild(opt)
+          })
+
+          const anioActual = new Date().getFullYear()
+          selectAnio.value = anios.includes(anioActual) ? anioActual : anios[0]
+
+          function actualizarDatos(anioSeleccionado) {
+            const tituloAlumnos = document.getElementById('titulo-alumnos')
+
+            if (parseInt(anioSeleccionado) === anioActual) {
+              tituloAlumnos.textContent = 'Alumnos activos'
+              const activos = alumnos.filter(a => a.anio == anioSeleccionado && a.estado_terminacion === 'cursando').length
+              document.getElementById('alumnos-activos').textContent = activos
+            } else {
+              tituloAlumnos.textContent = 'Alumnos egresados'
+              const egresados = alumnos.filter(a => a.anio == anioSeleccionado && a.estado_terminacion === 'egresado').length
+              document.getElementById('alumnos-activos').textContent = egresados
+            }
+
+            const abandonos = alumnos.filter(a => a.anio == anioSeleccionado && a.estado_terminacion === 'abandonado').length
+            document.getElementById('abandonos').textContent = abandonos
+          }
+
+          actualizarDatos(selectAnio.value)
+          selectAnio.addEventListener('change', () => {
+            actualizarDatos(selectAnio.value)
+          })
+        } catch (error) {
+          console.error("Error al cargar datos", error)
+          document.getElementById('cursos-activos').textContent = '0'
+          document.getElementById('alumnos-activos').textContent = '0'
+          document.getElementById('abandonos').textContent = '0'
+        }
+      }
+
+      if (ocupacion === 'profesor') {
+        document.getElementById('prof-content').classList.remove('hidden')
+        document.getElementById('saludo').textContent = `¡Bienvenido, profesor ${nombre || ''}!`
+
+        const profButtons = document.getElementById('prof-buttons')
+        profButtons.innerHTML = `
+          <a href="/correccion-practicos" class="bg-blue-700 text-white px-5 py-2 rounded-full shadow hover:bg-blue-800 transition">Corrección de prácticos</a>
+          <a href="/cargar-examenes" class="bg-green-700 text-white px-5 py-2 rounded-full shadow hover:bg-green-800 transition">Cargar exámenes</a>
+          <a href="/cargar-notas-cursado" class="bg-purple-700 text-white px-5 py-2 rounded-full shadow hover:bg-purple-800 transition">Cargar notas de la cursada</a>
+        `
+
+        try {
+          const resCursos = await fetch(`http://localhost:4000/api/curso/personal/${id_personal}/cursos`, {
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+          })
+          const jsonCursos = await resCursos.json()
+          const cursos = jsonCursos.body
+
+          const listaCursos = document.getElementById('lista-cursos')
+          listaCursos.innerHTML = cursos.length
+            ? cursos.map(c => `<li>${c.nombre}</li>`).join('')
+            : '<li>No tenés cursos asignados.</li>'
+
+          const resAlumnos = await fetch('http://localhost:4000/api/curso/alumnos-cursos', {
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+          })
+          const jsonAlumnos = await resAlumnos.json()
+          const anioActual = new Date().getFullYear()
+
+          const cursosIds = cursos.map(c => c.id)
+          const alumnosDelProfesor = jsonAlumnos.body.filter(a => a.anio == anioActual && cursosIds.includes(a.id_curso))
+
+          document.getElementById('total-alumnos').textContent = alumnosDelProfesor.length
+        } catch (error) {
+          console.error("Error al cargar datos", error)
+          document.getElementById('lista-cursos').innerHTML = '<li>Error al cargar cursos.</li>'
+          document.getElementById('total-alumnos').textContent = '0'
+        }
+      }
+    })
+  </script>
 </DashboardLayout>

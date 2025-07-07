@@ -18,6 +18,9 @@ import MoodleLayout from "../layouts/Moodle-Layout.astro";
   </div>
 
   <div id="datosPersonales" class="bg-white rounded-xl shadow border border-gray-200 p-8 mt-8 w-full">
+    <a href="/inicio" class="flex items-center text-black hover:underline mb-4">
+      <span class="mr-1">←</span> Volver al inicio
+    </a>
     <h2 class="text-2xl font-bold text-blue-700 mb-4 border-b border-gray-200 pb-2">Datos personales</h2>
   </div>
 
@@ -44,7 +47,7 @@ let alumno = []
 let token = []
 addEventListener('DOMContentLoaded',async ()=>{
     alumno = await obtenerAlumno()
-    cargarFoto()
+    cargarFoto(alumno[0].imagen)
     agregarHTML(alumno[0])
 })
 
@@ -272,7 +275,9 @@ async function cambiarDatosPersonales(){
 }
 
 async function cargarFoto(imagen = null){
-  if(!imagen === null){
+console.log(imagen)
+  if(imagen !== null){
+    console.log(imagen)
     document.getElementById('imagen-perfil').src = 'http://localhost:4000/' + imagen
   }
 
