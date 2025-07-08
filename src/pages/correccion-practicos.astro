@@ -33,7 +33,7 @@ import DashboardLayout from "../layouts/Dashboard-Layout.astro";
               <h3 class="font-semibold text-base text-blueGray-700">Prácticos cargados</h3>
             </div>
             <div class="relative flex-grow flex-1 sm:text-right">
-              <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" id="search-by-dni" type="text" placeholder="Buscar">
+              <input class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" id="search-by-dni" type="text" placeholder="Buscar por dni">
               <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
             </div>
           </div>
@@ -162,7 +162,7 @@ function renderPage(data = currentData) {
       tr.innerHTML = `
         <th class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${alumno.dni}</th>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${alumno.nombre} ${alumno.apellido}</td>
-        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${material.estado || 'Sin corregir'}</td>
+        <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${material.estado === 'enviado' ? 'recibido' : 'sin corregir'}</td>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
           <button class="mr-2 rounded-3xl bg-blue-700 py-1 px-3 text-white text-xs corregir-btn">Corregir</button>
         </td>
@@ -255,7 +255,6 @@ function ModalConfirmacion(estado) {
     <div id="modal-confirmacion" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg flex flex-col items-center space-y-4 relative">
         <h2 class="text-lg font-semibold text-gray-800 text-center">${estado ? 'Guardado con éxito' : 'Error al guardar'}</h2>
-        ${estado ? '<p class="text-base text-gray-500 text-center">Los cambios solo se verán al actualizar la página</p>' : ''}
         <button id="cerrar" class="px-4 py-2 ${estado ? 'bg-green-700 hover:bg-green-600' : 'bg-red-700 hover:bg-red-600'} text-white rounded">Aceptar</button>
       </div>
     </div>`

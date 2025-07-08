@@ -2,13 +2,13 @@
 import MoodleLayout from "../../layouts/Moodle-Layout.astro"
 ---
 
-<MoodleLayout title='titulo'>
+<MoodleLayout title='Curso'>
   <div class="w-full bg-white shadow-md rounded-xl p-6 text-center">
     <h1 id="titulo" class="text-2xl font-semibold text-gray-800"></h1>
   </div>
 
   <section id="mainContainer" class="w-full bg-white rounded-xl shadow p-6 space-y-8">
-    <select class="appearance-none block bg-gray-300 text-white rounded-xl py-3 px-4 mb-3 leading-tight focus:outline-none hidden" id="add-element" name="add-element">
+    <select class="appearance-none w-[247px] leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg hidden" id="add-element" name="add-element">
       <option value="" disabled selected>-- Agregar elemento --</option>
       <option value="section">Sección</option>
       <option value="link">Link (archivo)</option>
@@ -302,13 +302,34 @@ function crearElementoEntrega(elemento, index, permiso) {
     deleteButton.classList.add('hidden')
   }
   deleteButton.innerText = '×'
-  deleteButton.addEventListener('click', (e) => {
+
+  deleteButton.addEventListener('click', async (e) => {
     e.stopPropagation()
-    mostrarModalConfirmacion(() => {
+    mostrarModalConfirmacion(async () => {
+      const nombreCarpeta = elemento.text
+
+      try {
+        const res = await fetch(`http://localhost:4000/api/material/carpeta/${encodeURIComponent(nombreCarpeta)}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+
+        if (!res.ok) {
+          alert('Error al eliminar los materiales de la carpeta')
+          return
+        }
+      } catch (error) {
+        console.error('Error al eliminar materiales:', error)
+        alert('Error al eliminar materiales')
+        return
+      }
+
+      // Borrar del array local y re-renderizar
       elementos.splice(index, 1)
       renderDesdeElementos()
-    }, '¿Seguro que querés eliminar esta entrega?')
+    }, '¿Seguro que querés eliminar esta entrega y todos sus archivos?')
   })
+
   spanElement.appendChild(deleteButton)
 
   return spanElement
@@ -501,7 +522,10 @@ function mostrarModalLinkConArchivo() {
         <button id='closeModal' class="absolute top-2 right-3 text-gray-500 hover:text-black text-lg">&times;</button>
         <h2 class="text-xl font-semibold text-gray-800">Cargar archivo</h2>
         <select id="seccion" class="appearance-none block w-full bg-gray-300 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">${options}</select>
-        <input type="file" id="archivo" class="block w-full text-sm text-gray-700">
+        <div class="flex items-center space-x-4">
+          <input type="file" id="archivo" accept="image/jpeg,image/png,image/webp,application/pdf" 
+            class="block w-full rounded-lg border border-gray-300 bg-blue-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white file:text-blue-600 hover:file:bg-gray-100 transition">
+        </div>
         <button id="guardarArchivo" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Guardar archivo</button>
       </div>
     </div>
@@ -513,41 +537,42 @@ function mostrarModalLinkConArchivo() {
     document.getElementById('add-element').value = ''
   })
 
-document.getElementById('guardarArchivo').addEventListener('click', async () => {
-  const cursoId = json.id
-  const archivo = document.getElementById('archivo').files[0]
-  const seccionIndex = parseInt(document.getElementById('seccion').value)
+  document.getElementById('guardarArchivo').addEventListener('click', async () => {
+    const cursoId = json.id
+    const archivo = document.getElementById('archivo').files[0]
+    const seccionIndex = parseInt(document.getElementById('seccion').value)
 
-  if (!archivo || isNaN(seccionIndex)) {
-    alert('Faltan datos.')
-    return
-  }
+    if (!archivo || isNaN(seccionIndex)) {
+      alert('Faltan datos.')
+      return
+    }
 
-  const formData = new FormData()
-  formData.append('archivo', archivo)
-  formData.append('curso_id', cursoId)
-  formData.append('observacion', archivo.name)
+    const formData = new FormData()
+    formData.append('archivo', archivo)
+    formData.append('curso_id', cursoId)
+    formData.append('observacion', archivo.name)
 
-  const response = await fetch('http://localhost:4000/api/material', {
-    method: 'POST',
-    headers: { 'Authorization': `Bearer ${token}` },
-    body: formData
+    const response = await fetch('http://localhost:4000/api/material', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` },
+      body: formData
+    })
+
+    if (response.ok) {
+      const data = await response.json()
+      const fileId = data.body.id
+      const downloadLink = `http://localhost:4000/api/material/descargar/${fileId}`
+
+      elementos.push({ seccionId: seccionIndex, type: 'link', text: archivo.name, link: downloadLink })
+      renderDesdeElementos()
+      div.remove()
+      document.getElementById('add-element').value = ''
+    } else {
+      alert('Error al guardar el archivo.')
+    }
   })
-
-  if (response.ok) {
-    const data = await response.json()
-    const fileId = data.body.id
-    const downloadLink = `http://localhost:4000/api/material/descargar/${fileId}`
-
-    elementos.push({ seccionId: seccionIndex, type: 'link', text: archivo.name, link: downloadLink })
-    renderDesdeElementos()
-    div.remove()
-    document.getElementById('add-element').value = ''
-  } else {
-    alert('Error al guardar el archivo.')
-  }
-})
 }
+
 
 function mostrarModalEntrega() {
   const div = document.createElement('DIV')

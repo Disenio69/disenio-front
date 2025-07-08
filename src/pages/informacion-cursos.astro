@@ -2,12 +2,18 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 <DashboardLayout title="Informacion sobre cursos activos" path='Informacion sobre cursos activos' pageTitle='Informacion sobre cursos activos'>
-  <span class="float-right mr-14">
+    <div class="relative w-[150px]">
+      <select id="select-year" class="appearance-none w-full leading-tight focus:outline-none rounded-3xl border-2 border-gray-700 px-8 py-1.5 text-black text-lg pr-10 shadow-lg ml-10">
+      </select>
+      <i class="fa-solid fa-angle-down absolute left-40 top-1/2 -translate-y-1/2 pointer-events-none text-black"></i>
+    </div> 
+
+  <span class="float-right mr-14 mb-2">
     <span class="text-sm text-gray-700">Descargar como:</span>
     <i id="download-csv" class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
   </span>
 
-  <div id="mainDiv" class="mt-5 pb-5">
+  <div id="mainDiv" class="pb-5">
     <div class="xl:w-full px-10">
       <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded mb-5">
         <div class="rounded-t mb-0 px-4 py-3 border-0">
@@ -28,9 +34,10 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
               <tr>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Nombre</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Descripcion</th>
-                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Inscriptos</th>
-                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Abandonos</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Cursando</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Egresados</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Desaprobados</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Abandonos</th>
               </tr>
             </thead>
             <tbody id="tbody"></tbody>
@@ -67,10 +74,13 @@ const paginationStart = document.getElementById('paginationStart')
 const paginationEnd = document.getElementById('paginationEnd')
 const totalPagination = document.getElementById('totalPagination')
 const inputSearchName = document.getElementById('search-by-name')
+const selectYear = document.getElementById('select-year')
 
 let filteredData = []
 
-document.addEventListener('DOMContentLoaded', () => loadData())
+document.addEventListener('DOMContentLoaded', () => {
+  loadData()
+})
 
 async function fetchData() {
   if (!data) {
@@ -79,14 +89,44 @@ async function fetchData() {
     })
     const json = await response.json()
     data = json.body
-    filteredData = data
+
+    // Obtener años únicos y ordenarlos descendente
+    const years = [...new Set(data.map(item => String(item.anio)))]
+    .filter(year => year !== "null" && year !== "" && year !== "undefined")
+    .sort((a, b) => b - a)
+
+
+    // Cargar opciones en el select
+    selectYear.innerHTML = ""
+    years.forEach(year => {
+      const opt = document.createElement('option')
+      opt.value = year
+      opt.textContent = year
+      selectYear.appendChild(opt)
+    })
+
+    // Seleccionar por defecto el primer año (mayor)
+    const defaultYear = years[0]
+    selectYear.value = defaultYear
+
+    // Filtrar datos iniciales
+    filteredData = data.filter(item => String(item.anio) === defaultYear)
+
+    // Listener para cambios
+    selectYear.addEventListener('change', () => {
+      const selectedYear = selectYear.value
+      currentStart = 0
+      currentEnd = limitColumns
+
+      filteredData = data.filter(item => String(item.anio) === selectedYear)
+      renderPage()
+    })
   }
   return data
 }
 
 async function loadData() {
   data = await fetchData()
-  filteredData = data
   renderPage()
 }
 
@@ -111,13 +151,15 @@ function renderPage() {
   const pageData = filteredData.slice(currentStart, currentEnd)
 
   pageData.forEach(item => {
+    console.log(item)
     tbody.innerHTML += `
       <tr>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 text-left text-sm font-bold text-xs">${item.nombre}</td>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.descripcion}</td>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.inscriptos}</td>
-        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.abandonos}</td>
         <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.egresados}</td>
+        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.desaprobados ?? 0}</td>
+        <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${item.abandonos}</td>
       </tr>
     `
   })
@@ -140,9 +182,11 @@ inputSearchName.addEventListener('input', () => {
   currentEnd = limitColumns
 
   if (search === "") {
-    filteredData = data
+    filteredData = data.filter(item => String(item.anio) === selectYear.value)
   } else {
-    filteredData = data.filter(item => item.nombre.toLowerCase().includes(search))
+    filteredData = data.filter(item => 
+      item.nombre.toLowerCase().includes(search) && String(item.anio) === selectYear.value
+    )
   }
 
   renderPage()
@@ -152,3 +196,4 @@ document.getElementById('download-csv')?.addEventListener("click", async () => {
   downloadCsv(filteredData, 'tabla-cursos-activos')
 })
 </script>
+

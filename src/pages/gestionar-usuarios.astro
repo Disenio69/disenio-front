@@ -4,13 +4,13 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 <DashboardLayout title="Gestionar usuarios" path='Gestionar usuarios' pageTitle='Gestionar usuarios'>
       <a class="rounded-3xl bg-blue-700 px-10 py-1.6 text-white text-lg ml-10 mr-0" href="/agregar-usuario">Agregar usuario</a>
-      <span class="float-right mr-14">
-        <span class="text-sm text-gray-700">Descargar como:</span>
-        <i id="download-csv" class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
-      </span>
             <!------------------------TABLE-------------------- -->
             <!------------------------TABLE-------------------- -->
-          <div id="mainDiv" class="mt-5 pb-5">
+          <div id="mainDiv" class="pb-5">
+            <span class="float-right mr-14 mb-2">
+              <span class="text-sm text-gray-700">Descargar como:</span>
+              <i id="download-csv" class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
+            </span>
             <div class="xl:w-full px-10">
               <div class="retive flex flex-col min-w-0 break-words bg-white w-full shadow-lg rounded mb-5">
                 <div class="rounded-t mb-0 px-4 py-3 border-0">
@@ -176,41 +176,94 @@ function closeModal() {
 }
 
 document.getElementById('tbody').addEventListener('click', async function(e) {
-  if (e.target && e.target.id === 'MoreInfo') {
-    const dni = parseInt(e.target.closest('tr').firstElementChild.textContent)
-    const targetUser = data.find(user => user.dni === dni)
+if (e.target && e.target.id === 'MoreInfo') {
+  const dni = parseInt(e.target.closest('tr').firstElementChild.textContent)
+  const targetUser = data.find(user => user.dni === dni)
 
-    const div = document.createElement('DIV')
-    div.innerHTML = `
-      <div id="modal" class="fixed inset-0 bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
-          <h2 class="text-3xl font-bold text-blue-600 mb-6 border-b-2 border-blue-500 pb-2 text-center">Información detallada</h2>
-          <div class="space-y-4 text-gray-700 text-sm">
-            ${moreInfoRow('Nombre y apellido', `${targetUser.nombre} ${targetUser.apellido}`)}
-            ${moreInfoRow('DNI', targetUser.dni)}
-            ${moreInfoRow('Correo', targetUser.correo)}
-            ${moreInfoRow('Teléfono', targetUser.telefono)}
-            ${moreInfoRow('Ocupación', targetUser.ocupacion)}
-            ${moreInfoRow('Fecha de nacimiento', targetUser.fecha_nacimiento.split('T')[0])}
-            ${targetUser.tipo === 'alumno' ? `
-              ${moreInfoRow('Nacionalidad', targetUser.nacionalidad)}
-              ${moreInfoRow('Domicilio', targetUser.domicilio)}
-              ${moreInfoRow('Nivel de estudio', targetUser.nivel_estudio)}
-              ${moreInfoRow('Discapacidad', targetUser.discapacidad)}
-              ${moreInfoRow('Programa social', targetUser.programa_social)}
-              ${moreInfoRow('Estado civil', targetUser.estado_civil)}
-            ` : ''}
+  let cursosHTML = ''
+  if (targetUser.tipo === 'personal' && targetUser.ocupacion.toLowerCase() === 'profesor') {
+    try {
+      const cursosRes = await fetch(`http://localhost:4000/api/curso/personal/${targetUser.id}/cursos`, {
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` }
+      })
+      const cursosData = await cursosRes.json()
+      if (cursosData.body && cursosData.body.length > 0) {
+        cursosHTML = `
+          <div class="mt-6">
+            <h3 class="text-xl font-bold text-indigo-600 border-b-2 border-indigo-300 pb-2 mb-2">Cursos asignados</h3>
+            <ul class="list-disc list-inside text-gray-700 space-y-1">
+              ${cursosData.body.map(curso => `<li class="hover:text-indigo-700 transition">${curso.nombre}</li>`).join('')}
+            </ul>
           </div>
-          <div class="flex justify-end mt-8">
-            <button id="closeModal" class="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-lg shadow-md transition-all duration-200">Cerrar</button>
-          </div>
-        </div>
-      </div>`
-    document.querySelector('#mainDiv')?.appendChild(div)
+        `
+      } else {
+        cursosHTML = `<p class="mt-4 text-gray-500 italic">Este profesor no está asignado a ningún curso.</p>`
+      }
+    } catch (error) {
+      console.error("Error al obtener cursos:", error)
+      cursosHTML = `<p class="mt-4 text-red-500 italic">Error al cargar los cursos.</p>`
+    }
   }
 
+  // Definir imagen de perfil o default
+  const imagenSrc = targetUser.imagen 
+  ? `http://localhost:4000/${targetUser.imagen}` 
+  : '../../public/img/avatar-femenino.png'
+
+
+  const div = document.createElement('DIV')
+  div.innerHTML = `
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div class="bg-gradient-to-br from-white to-gray-100 p-10 rounded-3xl shadow-2xl w-full max-w-2xl relative animate-fade-in">
+        <div class="flex justify-center mb-6">
+          <img src="${imagenSrc}" alt="Foto perfil" class="w-32 h-32 object-cover rounded-full border-4 border-indigo-500 shadow-lg">
+        </div>
+        <h2 class="text-4xl font-extrabold text-indigo-700 mb-4 text-center">Información detallada</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-gray-700 text-sm">
+          ${moreInfoRow('Nombre y apellido', `${targetUser.nombre} ${targetUser.apellido}`)}
+          ${moreInfoRow('DNI', targetUser.dni)}
+          ${moreInfoRow('Correo', targetUser.correo)}
+          ${moreInfoRow('Teléfono', targetUser.telefono)}
+          ${moreInfoRow('Ocupación', targetUser.ocupacion)}
+          ${moreInfoRow('Fecha de nacimiento', targetUser.fecha_nacimiento.split('T')[0])}
+          ${targetUser.tipo === 'alumno' ? `
+            ${moreInfoRow('Nacionalidad', targetUser.nacionalidad)}
+            ${moreInfoRow('Domicilio', targetUser.domicilio)}
+            ${moreInfoRow('Nivel de estudio', targetUser.nivel_estudio)}
+            ${moreInfoRow('Discapacidad', targetUser.discapacidad)}
+            ${moreInfoRow('Programa social', targetUser.programa_social)}
+            ${moreInfoRow('Estado civil', targetUser.estado_civil)}
+          ` : ''}
+        </div>
+        ${cursosHTML}
+        <div class="flex justify-center mt-10">
+          <button id="closeModal" class="bg-red-500 hover:bg-red-600 text-white font-bold px-8 py-3 rounded-full shadow-lg transition-all duration-200">Cerrar</button>
+        </div>
+      </div>
+    </div>`
+  document.querySelector('#mainDiv')?.appendChild(div)
+}
+
+
+
   if (e.target && e.target.id === 'deleteButton') {
-    const id = e.target.dataset.id
+    const id = parseInt(e.target.dataset.id)
+    const row = e.target.closest('tr')
+    const dni = parseInt(row.firstElementChild.textContent)
+    const targetUser = data.find(user => user.dni === dni)
+
+    // Detectar tipo
+    const tipo = targetUser.tipo
+    let endpoint = ''
+
+    if (tipo === 'alumno') {
+      endpoint = 'http://localhost:4000/api/alumno'
+    } else if (tipo === 'personal') {
+      endpoint = 'http://localhost:4000/api/personal'
+    } else {
+      console.error("Tipo desconocido")
+      return
+    }
 
     const div = document.createElement('DIV')
     div.innerHTML = `
@@ -227,10 +280,10 @@ document.getElementById('tbody').addEventListener('click', async function(e) {
 
     document.getElementById("deleteUser").addEventListener("click", async () => {
       try {
-        const response = await fetch('http://localhost:4000/api/alumno', {
+        const response = await fetch(endpoint, {
           method: "PUT",
           headers: { "Content-Type": "application/json", 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({ id: parseInt(id) })
+          body: JSON.stringify({ id })
         })
 
         if (!response.ok) throw new Error(`Error al eliminar: ${response.statusText}`)
@@ -243,6 +296,7 @@ document.getElementById('tbody').addEventListener('click', async function(e) {
       }
     })
   }
+
 })
 
 document.getElementById('search-by-dni').addEventListener('input', () => {

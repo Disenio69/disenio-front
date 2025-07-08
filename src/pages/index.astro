@@ -26,7 +26,7 @@
             <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
               Iniciar sesión
             </button>
-            <a class="text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer" href="/examenes-y-materias">
+            <a id="forgot-password-btn" class="text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer">
               Olvidé mi contraseña
             </a>
           </div>
@@ -51,6 +51,7 @@
   const email = document.getElementById('mail')
   const password = document.getElementById('password')
   const mainContainer = document.getElementById('notification')
+  const forgotPasswordBtn = document.getElementById('forgot-password-btn')
 
   loginBtn.addEventListener('click', async () => {
     Notification.prototype.deletePreviousNotification()
@@ -89,11 +90,9 @@
           } else {
             if(usuario.ocupacion.toLowerCase() === 'alumno'){
               window.location.href = '/inicio'
-            }
-            else{
+            } else {
               window.location.href = '/error'
             }
-            
           }
         }
       } catch (err) {
@@ -104,5 +103,25 @@
         }
       }
     }
+  })
+
+  // Modal al hacer clic en "Olvidé mi contraseña"
+  forgotPasswordBtn.addEventListener('click', () => {
+    const modal = document.createElement('div')
+    modal.innerHTML = `
+      <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div class="bg-white p-6 rounded-xl shadow-xl max-w-md w-full relative">
+          <h2 class="text-xl font-bold mb-4 text-gray-800">¿Olvidaste tu contraseña?</h2>
+          <p class="text-gray-700 mb-6">Si has olvidado tu contraseña, contactate con el secretario a cargo:</p>
+          <p class="text-lg font-semibold text-blue-700">📞 +54 11 2345-6789</p>
+          <div class="flex justify-end mt-6">
+            <button id="btn-cerrar-modal" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-600">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    `
+    document.body.appendChild(modal)
+
+    document.getElementById('btn-cerrar-modal').addEventListener('click', () => modal.remove())
   })
 </script>

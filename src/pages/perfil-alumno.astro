@@ -109,170 +109,213 @@ function agregarHTML(alumno){
     datosPers?.appendChild(div)
 }
 
-document.getElementById('cambiarContrasenia').addEventListener('click',modalCambiarContraseña)
+document.getElementById('cambiarContrasenia').addEventListener('click',modalCambiarContraseña);
 
-async function modalCambiarContraseña(){
-    const div = document.createElement('DIV')
-    div.innerHTML = `
-    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+async function modalCambiarContraseña() {
+  const div = document.createElement('DIV')
+  div.innerHTML = `
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
         <h2 class="text-2xl font-semibold text-black mb-3">Cambiar contraseña</h2>
-        <label for="" class="text-black">Contraseña actual</label>
-        <input type="text" id="contraseniaActual" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700">
-        <label for=""class="text-black">Nueva contraseña</label>
-        <input type="text" id="contraseniaNueva" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700">
+        <label class="text-black">Contraseña actual</label>
+        <input type="password" id="contraseniaActual" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700">
+        <label class="text-black">Nueva contraseña</label>
+        <input type="password" id="contraseniaNueva" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700">
         <div class="flex justify-end gap-2">
           <button id="enviarContrasenia" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Cambiar contraseña</button>
           <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-black rounded hover:bg-gray-700">Cancelar</button>
         </div>
       </div>
     </div>
-    `
-    document.body.appendChild(div)
-    document.getElementById('cancelarModal').addEventListener('click',()=>div.remove())
-
-    document.getElementById('enviarContrasenia').addEventListener('click',async ()=>{
-        Notification.prototype.deletePreviousNotification()
-        let error = 0
-        const contraseniaActual = document.getElementById('contraseniaActual')
-        const contraseniaNueva = document.getElementById('contraseniaNueva')
-        error +=checkInputPassword(contraseniaActual)
-        error +=checkInputPassword(contraseniaNueva)
-        if(error === 0){
-            try {
-                const res = await fetch('http://localhost:4000/api/personal/cambiar-contrasena', {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization' : `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    id : personal[0].id,
-                    actualContrasena : contraseniaActual.value,
-                    nuevaContrasena : contraseniaNueva.value
-                })
-                })
-
-                const data = await res.json()
-
-                if (!res.ok) {
-                console.error('Error al cambiar contraseña:', data)
-                alert(`Error: ${data.body || 'No se pudo cambiar la contraseña'}`)
-                return
-                }
-
-                console.log('Respuesta:', data)
-                alert('Contraseña actualizada correctamente')
-            } catch (error) {
-                console.error('Error de red:', error)
-                alert('Error de red al cambiar contraseña')
-            }
-        }   
-    })
-
-}
-
-document.getElementById('cambiarDatosPersonales').addEventListener('click',cambiarDatosPersonales)
-
-async function cambiarDatosPersonales(){
-  const div = document.createElement('DIV')
-  div.innerHTML = `
-  <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-    <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
-      <h2 class="text-2xl font-semibold text-black mb-3">Cambiar datos personales</h2>
-      <label for="" class="text-black">Nombre:</label>
-      <input type="text" id="nombreInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].nombre}">
-      <label for=""class="text-black">Apellido:</label>
-      <input type="text" id="apellidoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].apellido}">
-      <label for="" class="text-black">Correo electronico:</label>
-      <input type="text" id="correoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].correo}">
-      <label for="" class="text-black">Telefono:</label>
-      <input type="text" id="telefonoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].telefono}">
-      <label for="" class="text-black">Cambiar foto de perfil</label>
-      <div class="flex items-center space-x-4">
-        <input type="file" id="imagenInput" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-gray-300 bg-blue-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white file:text-blue-600 hover:file:bg-gray-100 transition">
-      </div>
-      <div class="flex justify-end gap-2">
-        <button id="actualizarDatos" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Actualidar datos</button>
-        <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-black rounded hover:bg-gray-700">Cancelar</button>
-      </div>
-    </div>
-  </div>
   `
   document.body.appendChild(div)
-  document.getElementById('cancelarModal').addEventListener('click',()=>div.remove())
-  document.getElementById('actualizarDatos')?.addEventListener('click',async ()=> {
-    const nombreInput = document.getElementById('nombreInput')
-    const apellidoInput =document.getElementById('apellidoInput')
-    const correoInput =document.getElementById('correoInput')
-    const telefonoInput =document.getElementById('telefonoInput')
-    const imagenInput =document.getElementById('imagenInput')
 
+  document.getElementById('cancelarModal').addEventListener('click', () => div.remove())
+
+  document.getElementById('enviarContrasenia').addEventListener('click', async () => {
+    Notification.prototype.deletePreviousNotification()
     let error = 0
-    error += checkInputLetters(nombreInput,3,255)
-    error += checkInputLetters(apellidoInput,3,255)
-    error += checkInputEmail(correoInput,6,255)
-    error += checkInputNumbers(telefonoInput,6,20)
-    const image =imagenInput.files[0]
+    const contraseniaActual = document.getElementById('contraseniaActual')
+    const contraseniaNueva = document.getElementById('contraseniaNueva')
 
-    if(error === 0){
-      const body = {
-        id: alumno[0].id,
-        nombre: nombreInput.value,
-        apellido: apellidoInput.value,
-        correo: correoInput.value,
-        telefono: telefonoInput.value
-      }
-      console.log(body)
+    error += checkInputPassword(contraseniaActual)
+    error += checkInputPassword(contraseniaNueva)
 
-      if (imagenInput.files.length > 0){
-
-        const formDataImagen = new FormData()
-        formDataImagen.append('id', alumno[0].id)
-        formDataImagen.append('imagen', image)
-
-        fetch('http://localhost:4000/api/alumno/subir-imagen', {
-          method: 'POST',
-          headers: {
-            'Authorization' : `Bearer ${token}`
-          },
-          body: formDataImagen
-        })
-        .then(res => res.json())
-        .then(data => {
-          if (!data.error) {
-            cargarFoto(data.body.imagen)
-          }
-        })
-        .catch(err => {
-          console.error('Error:', err)
-        })
-      }
-      
+    if (error === 0) {
       try {
-        const res = await fetch(`http://localhost:4000/api/personal/editarDatosPersonales`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization' : `Bearer ${token}`
-        },
-        body: JSON.stringify(body)
+        const res = await fetch('http://localhost:4000/api/alumno/cambiar-contrasena', {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+          },
+          body: JSON.stringify({
+            id: alumno[0].id,
+            actualContrasena: contraseniaActual.value,
+            nuevaContrasena: contraseniaNueva.value
+          })
         })
 
         const data = await res.json()
 
         if (!res.ok) {
-          alert(`Error: ${data.body || 'No se pudo cambiar la contraseña'}`)
+          mostrarModalConfirmacion(`Error: ${data.body || 'No se pudo cambiar la contraseña'}`)
           return
         }
 
-    } catch (error) {
-      console.error(error)
-    }
+        // ✅ Cerrar modal de contraseña
+        div.remove()
 
+        // ✅ Mostrar modal de éxito
+        mostrarModalConfirmacion('Contraseña actualizada correctamente')
+
+      } catch (error) {
+        console.error('Error de red:', error)
+        mostrarModalConfirmacion('Error de red al cambiar contraseña')
+      }
     }
   })
 }
+
+function mostrarModalConfirmacion(mensaje) {
+  const modal = document.createElement('DIV')
+  modal.innerHTML = `
+    <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+        <h2 class="text-xl font-semibold text-gray-800">Mensaje</h2>
+        <p class="text-gray-700">${mensaje}</p>
+        <div class="flex justify-end">
+          <button id="btn-ok-confirmacion" class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600">OK</button>
+        </div>
+      </div>
+    </div>
+  `
+  document.body.appendChild(modal)
+
+  document.getElementById('btn-ok-confirmacion').addEventListener('click', () => modal.remove())
+}
+
+document.getElementById('cambiarDatosPersonales').addEventListener('click',cambiarDatosPersonales)
+
+
+async function cambiarDatosPersonales() {
+  const div = document.createElement('DIV')
+  div.innerHTML = `
+  <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+    <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+      <h2 class="text-2xl font-semibold text-black mb-3">Cambiar datos personales</h2>
+      <label class="text-black">Nombre:</label>
+      <input type="text" id="nombreInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].nombre}">
+      <label class="text-black">Apellido:</label>
+      <input type="text" id="apellidoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].apellido}">
+      <label class="text-black">Correo electrónico:</label>
+      <input type="text" id="correoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].correo}">
+      <label class="text-black">Teléfono:</label>
+      <input type="text" id="telefonoInput" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700" value="${alumno[0].telefono}">
+      <label class="text-black">Cambiar foto de perfil</label>
+      <div class="flex items-center space-x-4">
+        <input type="file" id="imagenInput" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-gray-300 bg-blue-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white file:text-blue-600 hover:file:bg-gray-100 transition">
+      </div>
+      <div class="flex justify-end gap-2">
+        <button id="actualizarDatos" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Actualizar datos</button>
+        <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-black rounded hover:bg-gray-700">Cancelar</button>
+      </div>
+    </div>
+  </div>`
+  document.body.appendChild(div)
+
+  document.getElementById('cancelarModal').addEventListener('click', () => div.remove())
+
+  document.getElementById('actualizarDatos').addEventListener('click', async () => {
+  const nombreInput = document.getElementById('nombreInput')
+  const apellidoInput = document.getElementById('apellidoInput')
+  const correoInput = document.getElementById('correoInput')
+  const telefonoInput = document.getElementById('telefonoInput')
+  const imagenInput = document.getElementById('imagenInput')
+
+  let error = 0
+  error += checkInputLetters(nombreInput, 3, 255)
+  error += checkInputLetters(apellidoInput, 3, 255)
+  error += checkInputEmail(correoInput, 6, 255)
+  error += checkInputNumbers(telefonoInput, 6, 20)
+  const image = imagenInput.files[0]
+
+  if (error === 0) {
+    try {
+      // Actualizar datos personales
+      const res = await fetch(`http://localhost:4000/api/alumno/editarDatosPersonales`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          id: alumno[0].id,
+          nombre: nombreInput.value,
+          apellido: apellidoInput.value,
+          correo: correoInput.value,
+          telefono: telefonoInput.value
+        })
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        alert(`Error: ${data.body || 'No se pudieron actualizar los datos'}`)
+        return
+      }
+
+      // Si hay imagen nueva, subirla
+      if (imagenInput.files.length > 0) {
+        const formDataImagen = new FormData()
+        formDataImagen.append('id', alumno[0].id)
+        formDataImagen.append('imagen', image)
+
+        const resImagen = await fetch('http://localhost:4000/api/alumno/subir-imagen', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
+          body: formDataImagen
+        })
+
+        const dataImg = await resImagen.json()
+        if (!resImagen.ok) {
+          alert(`Error al subir imagen: ${dataImg.body || 'No se pudo subir la imagen'}`)
+          return
+        }
+
+        cargarFoto(dataImg.body.imagen)
+        div.remove() // ✅ Cerramos el modal principal
+
+      }
+
+      // ✅ Recargar alumno actualizado y volver a renderizar
+      alumno = await obtenerAlumno()
+
+      // Actualizar nombre en encabezado
+      document.getElementById('nombre').textContent = `${alumno[0].nombre} ${alumno[0].apellido}`
+
+      // Borrar datos personales previos
+      const datosPers = document.getElementById('datosPersonales')
+      datosPers.querySelectorAll('div.ml-3').forEach(el => el.remove())
+
+      // Volver a renderizar info completa
+      agregarHTML(alumno[0])
+
+      // Cerrar modal principal
+      div.remove()
+      mostrarModalConfirmacion('Datos personales actualizados correctamente')
+
+    } catch (error) {
+      console.error(error)
+      alert('Error al actualizar datos')
+    }
+  }
+})
+
+}
+
 
 async function cargarFoto(imagen = null){
 console.log(imagen)

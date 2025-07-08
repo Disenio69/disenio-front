@@ -2,7 +2,7 @@
 import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 ---
 
-<DashboardLayout title="Alumnos inscriptos" path='Alumnos inscriptos' pageTitle='Alumnos inscriptos'>
+<DashboardLayout title="Gestión de inscripciones" path='Gestión de inscripciones' pageTitle='Gestión de inscripciones'>
   <div class="flex items-center space-x-4 ml-10">
     <a class="rounded-3xl bg-blue-700 px-10 py-1.5 text-white text-lg" href="/inscribir-alumno">Inscribir alumno</a>
     <div class="relative w-[250px]">
@@ -22,6 +22,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
         <option value="">Todos los estados</option>
         <option value="cursando">Cursando</option>
         <option value="egresado">Egresado</option>
+        <option value="desaprobado">Desaprobado</option>
         <option value="abandonado">Abandonodo</option>
       </select>
       <i class="fa-solid fa-angle-down absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-black"></i>
@@ -29,7 +30,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
 
   </div>
-  <span class="float-right mr-14">
+  <span class="float-right mr-14 mb-2">
     <span class="text-sm text-gray-700">Descargar como:</span>
     <i id="download-csv" class="fa-solid fa-file-csv fa-xl cursor-pointer text-[color:#217346] hover:text-green-800 transition-colors duration-200 ml-2" title="Descargar CSV"></i>
   </span>
@@ -55,6 +56,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">DNI</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Nombre</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Apellido</th>
+                <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Año</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Curso</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Estado</th>
                 <th class="px-6 bg-blueGray-50 text-blueGray-500 border border-solid py-3 text-xs uppercase whitespace-nowrap font-semibold text-left">Opciones</th>
@@ -164,6 +166,7 @@ function renderPage(currentData = filteredData) {
       <td class="border-t-0 px-6 p-4 text-left text-sm font-bold text-xs">${item.dni}</td>
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.nombre}</td>
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.apellido}</td>
+      <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.anio}</td>
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.curso_nombre}</td>
       <td class="border-t-0 px-6 p-4 font-bold text-xs">${item.estado_terminacion}</td>
       <td class="border-t-0 px-6 p-4">

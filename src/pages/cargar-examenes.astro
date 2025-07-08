@@ -28,7 +28,7 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
               <h3 class="font-semibold text-base text-blueGray-700">Lista de usuarios</h3>
             </div>
             <div class="relative flex-grow flex-1 sm:text-right">
-              <input id="search-by-dni" class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar">
+              <input id="search-by-dni" class="border-2 border-black text-black text-xs font-bold px-7 py-1 rounded-full" type="text" placeholder="Buscar por dni">
               <i class="relative md:visible invisible top-0.5 right-48 fa-solid fa-magnifying-glass" style="color: #000000;"></i>
             </div>
           </div>
@@ -99,6 +99,7 @@ async function obtenerExamenes(curso){
   }
 }
 
+
 function renderPage(currentData = examenes) {
   const tbody = document.getElementById('tbody')
   tbody.innerHTML = ''
@@ -114,11 +115,66 @@ function renderPage(currentData = examenes) {
       <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${examen.observacion}</td>
       <td class="border-t-0 px-6 align-center border-l-0 border-r-0 whitespace-nowrap p-4 font-bold text-xs">${examen.calificacion}</td>
       <td class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-        <button class="rounded-3xl bg-red-600 w-6 h-6"><i class="fa-solid fa-xmark" style="color: #000000;"></i></button>
+        <button class="rounded-3xl bg-red-600 w-6 h-6 btn-eliminar" data-id="${examen.id}">
+          <i class="fa-solid fa-xmark" style="color: #000000;"></i>
+        </button>
       </td>
     `
+
     tbody.appendChild(tr)
   })
+
+document.querySelectorAll('.btn-eliminar').forEach(btn => {
+  btn.addEventListener('click', (e) => {
+    const id = e.currentTarget.getAttribute('data-id')
+
+    // Crear modal de confirmación
+    const modal = document.createElement('DIV')
+    modal.innerHTML = `
+      <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+          <h2 class="text-xl font-semibold text-gray-800">Confirmar eliminación</h2>
+          <p class="text-gray-700">¿Estás seguro que deseas eliminar este examen? Esta acción no se puede deshacer.</p>
+          <div class="flex justify-end gap-2">
+            <button id="btn-confirmar-eliminar" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Eliminar</button>
+            <button id="btn-cancelar-eliminar" class="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">Cancelar</button>
+          </div>
+        </div>
+      </div>
+    `
+    document.body.appendChild(modal)
+
+    document.getElementById('btn-cancelar-eliminar').addEventListener('click', () => {
+      modal.remove()
+    })
+
+    document.getElementById('btn-confirmar-eliminar').addEventListener('click', async () => {
+      await eliminarExamen(id)
+      modal.remove()
+      await obtenerExamenes(cursoSeleccionado)
+
+      // Mostrar modal de éxito
+      const successModal = document.createElement('DIV')
+      successModal.innerHTML = `
+        <div class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+            <h2 class="text-xl font-semibold text-gray-800">Examen eliminado</h2>
+            <p class="text-gray-700">El examen fue eliminado correctamente.</p>
+            <div class="flex justify-end">
+              <button id="btn-ok-eliminar" class="px-4 py-2 bg-green-700 text-white rounded hover:bg-green-600">OK</button>
+            </div>
+          </div>
+        </div>
+      `
+      document.body.appendChild(successModal)
+
+      document.getElementById('btn-ok-eliminar').addEventListener('click', () => {
+        successModal.remove()
+      })
+    })
+  })
+})
+
 
   paginationStart.textContent = start + 1
   paginationEnd.textContent = Math.min(end, currentData.length)
@@ -127,6 +183,29 @@ function renderPage(currentData = examenes) {
   previousPageBtn.disabled = currentPage === 1
   nextPageBtn.disabled = currentPage >= Math.ceil(currentData.length / rowsPerPage)
 }
+
+// ✅ Función para eliminar examen
+async function eliminarExamen(id) {
+  try {
+    const res = await fetch('http://localhost:4000/api/material/', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ id })
+    })
+    const data = await res.json()
+    if (!res.ok) {
+      const mensaje = data.body || data.message || 'Error desconocido'
+      showModal("Error: " + mensaje, 'Error')
+    }
+  } catch (error) {
+    console.error('Error al eliminar examen:', error)
+  }
+}
+
+
 
 
 previousPageBtn.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderPage() } })
@@ -168,108 +247,107 @@ async function cargarDatos() {
     }
   })
 
-  document.getElementById('cargarExamen').addEventListener('click', async () => {
-    let alumnos = []
+document.getElementById('cargarExamen').addEventListener('click', async () => {
+  let alumnos = []
 
-    try {
-      const resAlumnosCurso = await fetch(`http://localhost:4000/api/curso/${cursoSeleccionado.id}/alumnos-simples`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      const dataAlumnosCurso = await resAlumnosCurso.json()
-      alumnos = dataAlumnosCurso.body
-
-    } catch (error) {
-      showModal("Error al cargar alumnos", 'Error')
-      console.error('Error al traer alumnos:', error)
-      return
-    }
-
-    let opcionesAlumnos = `<option value="" disabled selected>Seleccionar alumno</option>`
-    alumnos.forEach(alumno => {
-      opcionesAlumnos += `<option value="${alumno.id}">${alumno.dni} - ${alumno.nombre} ${alumno.apellido}</option>`
+  try {
+    const resAlumnosCurso = await fetch(`http://localhost:4000/api/curso/${cursoSeleccionado.id}/alumnos-simples`, {
+      headers: { 'Authorization': `Bearer ${token}` }
     })
+    const dataAlumnosCurso = await resAlumnosCurso.json()
+    alumnos = dataAlumnosCurso.body
 
-    const modal = document.createElement('DIV')
-    modal.innerHTML = `
-      <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-        <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
-          <h2 class="text-xl font-semibold text-gray-800">Cargar examen</h2>
-          <div class="flex items-center space-x-4">
-            <input type="file" id="examenInput" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-gray-300 bg-blue-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white file:text-blue-600 hover:file:bg-gray-100 transition">
-          </div>
-          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Alumno</label>
-          <select id="selectAlumno" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">
-            ${opcionesAlumnos}
-          </select>
-          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Subir con el nombre de:</label>
-          <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="observacion" type="text">
-          <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Nota</label>
-          <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="calificacion" type="text" placeholder="0.00">
-          <div class="flex justify-end gap-2">
-            <button id="cargarExamenModal" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500">Subir examen</button>
-            <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
-          </div>
-        </div>
-      </div>`
-    document.body.appendChild(modal)
+    // 🔥 Filtrar alumnos del año actual
+    const anioActual = new Date().getFullYear()
+    alumnos = alumnos.filter(alumno => alumno.anio === anioActual)
+  } catch (error) {
+    showModal("Error al cargar alumnos", 'Error')
+    console.error('Error al traer alumnos:', error)
+    return
+  }
 
-    document.getElementById('cancelarModal').addEventListener('click', () => modal.remove())
-
-    document.getElementById('cargarExamenModal').addEventListener('click', async () => {
-      Notification.prototype.deletePreviousNotification()
-
-      const alumno = document.getElementById('selectAlumno')
-      const alumnoId = document.getElementById('selectAlumno').value
-      const calificacion = document.getElementById('calificacion')
-      const calificacionValue = calificacion.value
-      const observacion = document.getElementById('observacion')
-      const observacionValue = observacion.value
-      const archivo = document.getElementById('examenInput')
-
-      let error = 0
-      if(!alumnoId) {
-        new Notification("Seleccione un alumno", 'error',alumno)
-        error += 1
-      }else{
-        error += 0
-      }
-      if(observacionValue.length<=0){
-        new Notification("Debe introducir un nombre", 'error',observacion)
-        error += 1
-      }
-      else{
-        error += 0
-      }
-
-      if (calificacionValue.length < 1 || calificacionValue.length > 3) {
-        new Notification(`Este campo no puede quedar en blanco. Ejemplo: 8 o 8.50`, 'error', calificacion)
-        error += 1
-      }
-      else{
-        if (!/^\d+(\.\d+)?$/.test(calificacionValue)) {
-          new Notification("Introduzca un número válido, como: 8 o 8.50", 'error', calificacion)
-          error += 1
-        }
-        else{
-          error += 0
-        }
-      }
-
-      if(error === 0){
-        await enviarExamen(alumnoId, calificacionValue, observacion, archivo.files[0], cursoSeleccionado.id)
-        modal.remove()
-
-        // 👇 Volver a cargar los exámenes para actualizar la tabla
-        await obtenerExamenes(cursoSeleccionado)
-      }
-    })
+  let opcionesAlumnos = `<option value="" disabled selected>Seleccionar alumno</option>`
+  alumnos.forEach(alumno => {
+    opcionesAlumnos += `<option value="${alumno.id}">${alumno.dni} - ${alumno.nombre} ${alumno.apellido}</option>`
   })
+
+  const modal = document.createElement('DIV')
+  modal.innerHTML = `
+    <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+      <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+        <h2 class="text-xl font-semibold text-gray-800">Cargar examen</h2>
+        <div class="flex items-center space-x-4">
+          <input type="file" id="examenInput" accept="image/jpeg,image/png,image/webp" class="block w-full rounded-lg border border-gray-300 bg-blue-600 text-white file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:bg-white file:text-blue-600 hover:file:bg-gray-100 transition">
+        </div>
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Alumno</label>
+        <select id="selectAlumno" class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none">
+          ${opcionesAlumnos}
+        </select>
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Subir con el nombre de:</label>
+        <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="observacion" type="text">
+        <label class="block uppercase tracking-wide text-gray-700 text-xs font-bold mb-2">Nota</label>
+        <input class="appearance-none block w-full bg-gray-200 text-gray-700 rounded py-3 px-4 mb-3 leading-tight focus:outline-none" id="calificacion" type="text" placeholder="0.00">
+        <div class="flex justify-end gap-2">
+          <button id="cargarExamenModal" class="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-500">Subir examen</button>
+          <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">Cancelar</button>
+        </div>
+      </div>
+    </div>`
+  document.body.appendChild(modal)
+
+  document.getElementById('cancelarModal').addEventListener('click', () => modal.remove())
+
+  document.getElementById('cargarExamenModal').addEventListener('click', async () => {
+    Notification.prototype.deletePreviousNotification()
+
+    const alumno = document.getElementById('selectAlumno')
+    const alumnoId = alumno.value
+    const calificacion = document.getElementById('calificacion')
+    const calificacionValue = calificacion.value
+    const observacion = document.getElementById('observacion')
+    const observacionValue = observacion.value
+    const archivo = document.getElementById('examenInput')
+
+    let error = 0
+    if(!alumnoId) {
+      new Notification("Seleccione un alumno", 'error', alumno)
+      error += 1
+    }
+    if(observacionValue.length <= 0){
+      new Notification("Debe introducir un nombre", 'error', observacion)
+      error += 1
+    }
+    if (calificacionValue.length < 1 || calificacionValue.length > 3) {
+      new Notification(`Este campo no puede quedar en blanco. Ejemplo: 8 o 8.50`, 'error', calificacion)
+      error += 1
+    } else {
+      if (!/^\d+(\.\d+)?$/.test(calificacionValue)) {
+        new Notification("Introduzca un número válido, como: 8 o 8.50", 'error', calificacion)
+        error += 1
+      }
+    }
+    if(error === 0){
+      await enviarExamen(alumnoId, calificacionValue, observacion, archivo.files[0], cursoSeleccionado.id)
+      modal.remove()
+
+      // Reiniciar página a la primera
+      currentPage = 1
+
+      // Actualizar exámenes
+      await obtenerExamenes(cursoSeleccionado)
+
+      // Renderizar
+      renderPage()
+    }
+  })
+})
+
 }
 
 async function enviarExamen(alumno_id, calificacion, observacion, archivo, curso_id) {
   try {
     const formData = new FormData()
-    formData.append('observacion', observacion)
+    formData.append('observacion', observacion.value)
     formData.append('curso_id', curso_id)
     formData.append('alumno_id', alumno_id)
     formData.append('archivo', archivo)

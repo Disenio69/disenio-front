@@ -99,8 +99,11 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 
         </div>
         <div class="flex items-center ml-6">
-            <button id="form-submit" class="bg-gray-500 text-white font-bold py-2 px-4 rounded " type="submit">
-              Agregar usuario
+            <button id="form-submit" class="bg-blue-700 text-white font-bold py-2 px-4 rounded " type="submit">
+              Guardar cambios
+            </button>
+            <button id="cambiar-contrasenia" class="bg-green-600 text-white font-bold py-2 px-4 rounded ml-20">
+              Cambiar contraseña
             </button>
             <a class="bg-white text-black font-bold px-4 hover:border-b-2 border-b-black cursor-pointer ml-20" href="/gestionar-usuarios">
                 Cancelar
@@ -110,58 +113,63 @@ import DashboardLayout from '../layouts/Dashboard-Layout.astro';
 </DashboardLayout>
 
 <script>
+  //@ts-nocheck
+import * as validation from "../components/validations"
 import { Notification } from "../components/notifications.js"
 
-let isStudent = false;
-let currentId: number | null = null;
+let isStudent = false
+let currentId = null
 const token = localStorage.getItem('token')
 
-const btnSubmit = document.querySelector("#form-submit") as HTMLButtonElement;
-btnSubmit.disabled = true;
+// 💥 MOVER estas variables arriba para que sean globales
+let tipoParam = null
+let idParam = null
+
+const btnSubmit = document.querySelector("#form-submit")
+btnSubmit.disabled = true
 
 document.addEventListener("DOMContentLoaded", () => {
-  const form = document.querySelector("#form-user-add") as HTMLFormElement;
-  const params = new URLSearchParams(window.location.search);
-  const idParam = params.get("id");
-  const tipoParam = params.get("tipo"); // "alumno" o "personal"
+  const form = document.querySelector("#form-user-add")
+  const params = new URLSearchParams(window.location.search)
+  idParam = params.get("id")
+  tipoParam = params.get("tipo") // ← se asigna acá
 
-  const inputsAll = document.querySelectorAll('.input') as NodeListOf<HTMLElement>;
-  const inputsEst = document.querySelectorAll('.input-student') as NodeListOf<HTMLElement>;
+  const inputsAll = document.querySelectorAll('.input')
+  const inputsEst = document.querySelectorAll('.input-student')
 
-  const name = document.querySelector("#input-firstName") as HTMLInputElement;
-  const lastName = document.querySelector("#input-lastName") as HTMLInputElement;
-  const birthDay = document.querySelector("#input-birthday") as HTMLInputElement;
-  const dni = document.querySelector("#input-dni") as HTMLInputElement;
-  const email = document.querySelector("#input-email") as HTMLInputElement;
-  const phone = document.querySelector("#input-phone") as HTMLInputElement;
-  const occupation = document.querySelector("#input-occupation") as HTMLInputElement;
-  const nationality = document.querySelector("#input-nationality") as HTMLInputElement;
-  const residence = document.querySelector("#input-residence") as HTMLInputElement;
-  const studyLevel = document.querySelector("#input-studyLevel") as HTMLInputElement;
-  const disability = document.querySelector("#input-disability") as HTMLInputElement;
-  const socialProgram = document.querySelector("#input-socialProgram") as HTMLInputElement;
-  const estadoCivil = document.querySelector("#input-social") as HTMLInputElement;
+  const name = document.querySelector("#input-firstName")
+  const lastName = document.querySelector("#input-lastName")
+  const birthDay = document.querySelector("#input-birthday")
+  const dni = document.querySelector("#input-dni")
+  const email = document.querySelector("#input-email")
+  const phone = document.querySelector("#input-phone")
+  const occupation = document.querySelector("#input-occupation")
+  const nationality = document.querySelector("#input-nationality")
+  const residence = document.querySelector("#input-residence")
+  const studyLevel = document.querySelector("#input-studyLevel")
+  const disability = document.querySelector("#input-disability")
+  const socialProgram = document.querySelector("#input-socialProgram")
+  const estadoCivil = document.querySelector("#input-social")
 
-  function showInputs(isAlumno: boolean) {
-    inputsAll.forEach(input => input.classList.remove("hidden"));
+  function showInputs(isAlumno) {
+    inputsAll.forEach(input => input.classList.remove("hidden"))
     if (isAlumno) {
-      inputsEst.forEach(input => input.classList.remove("hidden"));
+      inputsEst.forEach(input => input.classList.remove("hidden"))
     } else {
-      inputsEst.forEach(input => input.classList.add("hidden"));
+      inputsEst.forEach(input => input.classList.add("hidden"))
     }
-    btnSubmit.disabled = false;
-    btnSubmit.classList.remove("bg-gray-500");
-    btnSubmit.classList.add("bg-blue-500");
-    btnSubmit.textContent = "Guardar cambios";
+    btnSubmit.disabled = false
+    btnSubmit.classList.remove("bg-gray-500")
+    btnSubmit.classList.add("bg-blue-500")
+    btnSubmit.textContent = "Guardar cambios"
   }
 
-  // Validar que se pasaron los dos parámetros por URL
   if (idParam && tipoParam) {
-    currentId = Number(idParam);
-    isStudent = tipoParam === "alumno";
+    currentId = Number(idParam)
+    isStudent = tipoParam === "alumno"
 
-    const endpoint = `http://localhost:4000/api/${tipoParam}/${idParam}`;
-    
+    const endpoint = `http://localhost:4000/api/${tipoParam}/${idParam}`
+
     fetch(endpoint, {
       method: 'GET',
       headers: {
@@ -171,93 +179,245 @@ document.addEventListener("DOMContentLoaded", () => {
     })
     .then(res => res.json())
     .then(data => {
-        const usuario = (data.body ?? [])[0];
-        if (!usuario) {
-        alert("No se encontró el usuario.");
-        return;
-        }
+      const usuario = (data.body ?? [])[0]
+      if (!usuario) {
+        alert("No se encontró el usuario.")
+        return
+      }
 
-        showInputs(isStudent);
+      showInputs(isStudent)
 
-        name.value = usuario.nombre ?? "";
-        lastName.value = usuario.apellido ?? "";
-        birthDay.value = usuario.fecha_nacimiento?.split("T")[0] ?? "";
-        dni.value = usuario.dni ?? "";
-        email.value = usuario.correo ?? "";
-        phone.value = usuario.telefono ?? "";
-        occupation.value = usuario.ocupacion ?? "";
+      name.value = usuario.nombre ?? ""
+      lastName.value = usuario.apellido ?? ""
+      birthDay.value = usuario.fecha_nacimiento?.split("T")[0] ?? ""
+      dni.value = usuario.dni ?? ""
+      email.value = usuario.correo ?? ""
+      phone.value = usuario.telefono ?? ""
+      occupation.value = usuario.ocupacion ?? ""
 
-        if (isStudent) {
-        nationality.value = usuario.nacionalidad ?? "";
-        residence.value = usuario.domicilio ?? "";
-        studyLevel.value = usuario.nivel_estudio ?? "";
-        disability.value = usuario.discapacidad ?? "";
-        socialProgram.value = usuario.programa_social ?? "";
-        estadoCivil.value = usuario.estado_civil ?? "";
-        }
+      if (isStudent) {
+        nationality.value = usuario.nacionalidad ?? ""
+        residence.value = usuario.domicilio ?? ""
+        studyLevel.value = usuario.nivel_estudio ?? ""
+        disability.value = usuario.discapacidad ?? ""
+        socialProgram.value = usuario.programa_social ?? ""
+        estadoCivil.value = usuario.estado_civil ?? ""
+      }
+
+      let error = 0
+      Notification.prototype.deletePreviousNotification()
+
+      error += validation.checkInputLetters(name, 4, 20)
+      error += validation.checkInputLetters(lastName, 4, 20)
+      error += validation.checkInputDate(birthDay)
+      error += validation.checkInputNumbers(dni, 7, 10)
+      error += validation.checkInputEmail(email, 6, 254)
+      error += validation.checkInputNumbers(phone, 6, 10)
+      error += validation.checkInputAlphaNumeric(occupation, 4, 20)
+
+      if (isStudent) {
+        error += validation.checkInputLetters(nationality, 4, 20)
+        error += validation.checkInputLetters(residence, 4, 50)
+        error += validation.checkInputLetters(studyLevel, 4, 20)
+        error += validation.checkInputAlphaNumeric(disability, 4, 100)
+        error += validation.checkInputAlphaNumeric(socialProgram, 4, 50)
+        error += validation.checkInputLetters(estadoCivil, 4, 20)
+      }
+
+      if (error === 0) {
+        btnSubmit.disabled = false
+        btnSubmit.classList.remove("bg-gray-500")
+        btnSubmit.classList.add("bg-blue-500")
+        btnSubmit.textContent = "Guardar cambios"
+      }
     })
     .catch(err => {
-        alert("No se pudo cargar el usuario.");
-        console.error(err);
-    });
-
+      alert("No se pudo cargar el usuario.")
+      console.error(err)
+    })
   }
 
-  // Envío del formulario (PUT)
-  if (form) {
-    form.addEventListener("submit", async (event: Event) => {
-      event.preventDefault();
+if (form) {
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault()
 
-      const formData = isStudent
-        ? {
-            id:currentId,
-            telefono: phone.value,
-            nacionalidad: nationality.value,
-            domicilio: residence.value,
-            ocupacion: occupation.value,
-            programa_social: socialProgram.value,
-            discapacidad: disability.value,
-            nivel_estudio: studyLevel.value,
-            nombre: name.value,
-            apellido: lastName.value,
-            fecha_nacimiento: birthDay.value,
-            correo: email.value,
-            dni: dni.value,
-            estado_civil: estadoCivil.value
-          }
-        : {
-            id:currentId,
-            ocupacion: occupation.value,
-            nombre: name.value,
-            apellido: lastName.value,
-            fecha_nacimiento: birthDay.value,
-            correo: email.value,
-            dni: dni.value,
-            telefono: phone.value
-          };
+    Notification.prototype.deletePreviousNotification()
+    let error = 0
 
+    // Volver a validar todos los campos antes de enviar
+    error += validation.checkInputLetters(name, 4, 20)
+    error += validation.checkInputLetters(lastName, 4, 20)
+    error += validation.checkInputDate(birthDay)
+    error += validation.checkInputNumbers(dni, 7, 10)
+    error += validation.checkInputEmail(email, 6, 254)
+    error += validation.checkInputNumbers(phone, 6, 10)
+    error += validation.checkInputAlphaNumeric(occupation, 4, 20)
+
+    if (isStudent) {
+      error += validation.checkInputLetters(nationality, 4, 20)
+      error += validation.checkInputLetters(residence, 4, 50)
+      error += validation.checkInputLetters(studyLevel, 4, 20)
+      error += validation.checkInputAlphaNumeric(disability, 4, 100)
+      error += validation.checkInputAlphaNumeric(socialProgram, 4, 50)
+      error += validation.checkInputLetters(estadoCivil, 4, 20)
+    }
+
+    if (error > 0) {
+      return
+    }
+
+    // Preparar los datos para enviar
+    const formData = isStudent
+      ? {
+          id: currentId,
+          telefono: phone.value,
+          nacionalidad: nationality.value,
+          domicilio: residence.value,
+          ocupacion: occupation.value,
+          programa_social: socialProgram.value,
+          discapacidad: disability.value,
+          nivel_estudio: studyLevel.value,
+          nombre: name.value,
+          apellido: lastName.value,
+          fecha_nacimiento: birthDay.value,
+          correo: email.value,
+          dni: dni.value,
+          estado_civil: estadoCivil.value
+        }
+      : {
+          id: currentId,
+          ocupacion: occupation.value,
+          nombre: name.value,
+          apellido: lastName.value,
+          fecha_nacimiento: birthDay.value,
+          correo: email.value,
+          dni: dni.value,
+          telefono: phone.value
+        }
+
+    try {
+      const endpoint = `http://localhost:4000/api/${tipoParam}/editar`
+      const response = await fetch(endpoint, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (!response.ok) throw new Error("Error al enviar los datos")
+
+      const modalDiv = document.createElement('div')
+      modalDiv.innerHTML = `
+        <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
+            <h2 class="text-2xl font-bold text-center text-green-600 mb-6">¡Usuario actualizado correctamente!</h2>
+            <div class="flex justify-center">
+              <button id="confirmModalBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-full transition-all duration-200">Aceptar</button>
+            </div>
+          </div>
+        </div>`
+      document.body.appendChild(modalDiv)
+
+      document.getElementById("confirmModalBtn").addEventListener("click", () => {
+        window.location.href = "/gestionar-usuarios"
+      })
+
+    } catch (error) {
+      alert("Error: " + (error instanceof Error ? error.message : String(error)))
+    }
+  })
+}
+})
+
+document.getElementById("cambiar-contrasenia").addEventListener("click", (event) => {
+  event.preventDefault()
+  event.stopPropagation()
+
+  const div = document.createElement("DIV")
+  div.innerHTML = `
+  <div id="modal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+    <div class="bg-white p-6 rounded-xl w-full max-w-md shadow-lg space-y-4 relative">
+      <h2 class="text-2xl font-semibold text-black mb-3">Reemplazar contraseña</h2>
+      <label class="text-black">Nueva contraseña</label>
+      <input type="password" id="contraseniaNueva" class="bg-gray-300 block w-full rounded-lg h-10 pl-2 text-sm text-gray-700">
+      <div class="flex justify-end gap-2">
+        <button id="enviarContrasenia" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Reemplazar</button>
+        <button id="cancelarModal" class="px-4 py-2 bg-gray-400 text-black rounded hover:bg-gray-700">Cancelar</button>
+      </div>
+    </div>
+  </div>
+  `
+  document.body.appendChild(div)
+
+  document.getElementById("cancelarModal").addEventListener("click", () => div.remove())
+
+  document.getElementById("enviarContrasenia").addEventListener("click", async () => {
+    Notification.prototype.deletePreviousNotification()
+    let error = 0
+    const contraseniaNueva = document.getElementById("contraseniaNueva")
+
+    error += validation.checkInputPassword(contraseniaNueva)
+
+    if (error === 0) {
       try {
-        const endpoint = `http://localhost:4000/api/${tipoParam}/editar`;
-        const response = await fetch(endpoint, {
+        const res = await fetch(`http://localhost:4000/api/${tipoParam}/reemplazar-contrasena`, {
           method: "PATCH",
           headers: {
             "Content-Type": "application/json",
-            'Authorization': `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(formData)
-        });
+          body: JSON.stringify({
+            id: currentId,
+            nuevaContrasena: contraseniaNueva.value,
+          }),
+        })
 
-        if (!response.ok) throw new Error("Error al enviar los datos");
+        const data = await res.json()
+        div.remove()
 
-        alert(isStudent ? "Alumno actualizado" : "Personal actualizado");
-        form.reset();
-        window.location.href = "/gestionar-usuarios";
+        const modalDiv = document.createElement('div')
+        modalDiv.innerHTML = `
+          <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
+              <h2 class="text-2xl font-bold text-center ${res.ok ? 'text-green-600' : 'text-red-600'} mb-6">
+                ${res.ok ? '¡Contraseña reemplazada correctamente!' : `Error: ${data.body || 'No se pudo reemplazar la contraseña'}`}
+              </h2>
+              <div class="flex justify-center">
+                <button id="confirmModalBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-full transition-all duration-200">Aceptar</button>
+              </div>
+            </div>
+          </div>`
+        document.body.appendChild(modalDiv)
+
+        document.getElementById("confirmModalBtn").addEventListener("click", () => {
+          modalDiv.remove()
+        })
+
       } catch (error) {
-        alert("Error: " + (error instanceof Error ? error.message : String(error)));
-      }
-    });
-  }
-});
+        div.remove()
 
+        console.error("ERROR FETCH:", error)
+
+        const modalDiv = document.createElement('div')
+        modalDiv.innerHTML = `
+          <div id="modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white p-10 rounded-3xl shadow-2xl w-full max-w-md relative animate-fade-in">
+              <h2 class="text-2xl font-bold text-center text-red-600 mb-6">Error de red al reemplazar contraseña</h2>
+              <div class="flex justify-center">
+                <button id="confirmModalBtn" class="bg-blue-700 hover:bg-blue-800 text-white font-bold px-6 py-3 rounded-full transition-all duration-200">Aceptar</button>
+              </div>
+            </div>
+          </div>`
+        document.body.appendChild(modalDiv)
+
+        document.getElementById("confirmModalBtn").addEventListener("click", () => {
+          modalDiv.remove()
+        })
+      }
+    }
+  })
+})
 
 </script>
